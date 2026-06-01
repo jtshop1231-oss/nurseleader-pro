@@ -22,7 +22,8 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
         max_tokens: 1024,
-        system: systemPrompt,
+        // ✅ DITO LANG NAGBAGO - Isang linya lang
+        system: `Today's date is: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}. ${systemPrompt}`,
         messages
       })
     });

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>NurseLeader Pro</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
 <style>
@@ -27,47 +27,67 @@
     --radius-sm: 8px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'DM Sans', sans-serif; background: var(--primary-bg); color: var(--gray-800); min-height: 100vh; }
+  html, body { height: 100%; width: 100%; font-family: 'DM Sans', sans-serif; background: var(--primary-bg); color: var(--gray-800); overflow: hidden; }
 
   /* LOGIN */
-  #login-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #EBF8FF, #BEE3F8, #90CDF4); }
-  .login-card { background: var(--white); border-radius: 20px; padding: 40px 36px; width: 100%; max-width: 420px; box-shadow: 0 8px 32px rgba(43,108,176,0.15); text-align: center; }
-  .login-title { font-family: 'DM Serif Display', serif; font-size: 26px; color: var(--primary); margin: 12px 0 4px; }
-  .login-sub { font-size: 13px; color: var(--gray-600); margin-bottom: 28px; }
-  .field { margin-bottom: 14px; text-align: left; }
-  .field label { display: block; font-size: 11px; font-weight: 700; color: var(--gray-600); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
-  .field input, .field select { width: 100%; padding: 11px 14px; border: 2px solid var(--gray-200); border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none; transition: border-color 0.2s; }
+  #login-screen {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #EBF8FF, #BEE3F8, #90CDF4);
+    overflow: hidden;
+  }
+  .login-card {
+    background: var(--white);
+    border-radius: 20px;
+    padding: 20px 22px 24px;
+    width: calc(100% - 32px);
+    max-width: 400px;
+    box-shadow: 0 8px 32px rgba(43,108,176,0.15);
+    text-align: center;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .login-logo { width: 70px; height: 70px; margin: 0 auto 8px; display: block; }
+  .login-title { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--primary); margin-bottom: 2px; }
+  .login-sub { font-size: 12px; color: var(--gray-600); margin-bottom: 16px; }
+  .field { margin-bottom: 10px; text-align: left; }
+  .field label { display: block; font-size: 10px; font-weight: 700; color: var(--gray-600); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .field input, .field select { width: 100%; padding: 10px 12px; border: 2px solid var(--gray-200); border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none; transition: border-color 0.2s; }
   .field input:focus, .field select:focus { border-color: var(--primary-light); }
-  .api-note { font-size: 11px; color: var(--gray-400); margin-top: 5px; }
+  .api-note { font-size: 10px; color: var(--gray-400); margin-top: 4px; }
   .show-btn { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 12px; color: var(--gray-600); font-family: 'DM Sans', sans-serif; }
   .pw-wrap { position: relative; }
-  .login-btn { width: 100%; padding: 13px; background: var(--primary); color: white; border: none; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 6px; transition: background 0.2s; }
+  .login-btn { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 8px; transition: background 0.2s; }
   .login-btn:hover { background: var(--primary-light); }
-  .login-btn:disabled { background: var(--gray-200); cursor: not-allowed; }
+  .login-btn:disabled { background: var(--gray-400); cursor: not-allowed; }
+
+  /* APP SCREEN */
+  #app-screen { display: none; height: 100vh; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 
   /* HEADER */
-  .header { background: var(--white); border-bottom: 1px solid var(--gray-100); padding: 0 20px; height: 60px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow-sm); position: sticky; top: 0; z-index: 100; }
-  .header-left { display: flex; align-items: center; gap: 10px; }
-  .brand-name { font-family: 'DM Serif Display', serif; font-size: 17px; color: var(--primary); }
-  .brand-sub { font-size: 10px; color: var(--gray-400); }
-  .header-right { display: flex; align-items: center; gap: 12px; }
-  .avatar { width: 34px; height: 34px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 13px; }
+  .header { background: var(--white); border-bottom: 1px solid var(--gray-100); padding: 0 16px; height: 56px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow-sm); position: sticky; top: 0; z-index: 100; }
+  .header-left { display: flex; align-items: center; gap: 8px; }
+  .brand-name { font-family: 'DM Serif Display', serif; font-size: 16px; color: var(--primary); }
+  .brand-sub { font-size: 9px; color: var(--gray-400); }
+  .header-right { display: flex; align-items: center; gap: 8px; }
+  .avatar { width: 32px; height: 32px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 12px; }
   .logout-btn { padding: 5px 10px; background: var(--gray-100); border: none; border-radius: 6px; font-size: 11px; color: var(--gray-600); cursor: pointer; font-family: 'DM Sans', sans-serif; }
 
-  /* MAIN */
-  .main { max-width: 1100px; margin: 0 auto; padding: 20px; display: grid; grid-template-columns: 1fr 300px; gap: 20px; }
+  .main { max-width: 1100px; margin: 0 auto; padding: 16px; display: grid; grid-template-columns: 1fr 300px; gap: 16px; }
 
-  /* GREETING */
-  .greeting { background: linear-gradient(135deg, #2B6CB0, #4299E1); border-radius: var(--radius); padding: 20px 24px; color: white; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center; }
-  .greeting h2 { font-family: 'DM Serif Display', serif; font-size: 22px; margin-bottom: 3px; }
-  .greeting p { font-size: 13px; opacity: 0.85; }
+  .greeting { background: linear-gradient(135deg, #2B6CB0, #4299E1); border-radius: var(--radius); padding: 16px 20px; color: white; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; }
+  .greeting h2 { font-family: 'DM Serif Display', serif; font-size: 20px; margin-bottom: 2px; }
+  .greeting p { font-size: 12px; opacity: 0.85; }
 
-  /* CHAT */
-  .chat-card { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow-md); overflow: hidden; margin-bottom: 18px; }
-  .chat-header { padding: 14px 18px; border-bottom: 1px solid var(--gray-100); display: flex; align-items: center; gap: 8px; }
+  .chat-card { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow-md); overflow: hidden; margin-bottom: 14px; }
+  .chat-header { padding: 12px 16px; border-bottom: 1px solid var(--gray-100); display: flex; align-items: center; gap: 8px; }
   .chat-dot { width: 8px; height: 8px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-  .chat-messages { height: 280px; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; background: var(--gray-50); }
+  .chat-messages { height: 260px; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; background: var(--gray-50); }
   .chat-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--gray-400); text-align: center; gap: 6px; }
   .msg { max-width: 85%; padding: 10px 13px; border-radius: 12px; font-size: 13px; line-height: 1.6; animation: fadeIn 0.3s ease; }
   @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
@@ -79,41 +99,38 @@
   .dots span { width: 6px; height: 6px; background: var(--primary-light); border-radius: 50%; animation: bounce 1.2s infinite; }
   .dots span:nth-child(2){animation-delay:0.2s} .dots span:nth-child(3){animation-delay:0.4s}
   @keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
-  .chat-input-area { padding: 12px 16px; border-top: 1px solid var(--gray-100); display: flex; gap: 8px; background: var(--white); }
+  .chat-input-area { padding: 10px 14px; border-top: 1px solid var(--gray-100); display: flex; gap: 8px; background: var(--white); }
   .chat-input { flex: 1; padding: 9px 12px; border: 2px solid var(--gray-200); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 13px; outline: none; resize: none; }
   .chat-input:focus { border-color: var(--primary-light); }
-  .send-btn { padding: 9px 16px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; }
+  .send-btn { padding: 9px 14px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; }
   .send-btn:disabled { background: var(--gray-200); cursor: not-allowed; }
-  .clear-btn { padding: 9px 12px; background: var(--gray-100); color: var(--gray-600); border: none; border-radius: 8px; cursor: pointer; font-size: 12px; font-family: 'DM Sans', sans-serif; }
+  .clear-btn { padding: 9px 10px; background: var(--gray-100); color: var(--gray-600); border: none; border-radius: 8px; cursor: pointer; font-size: 12px; font-family: 'DM Sans', sans-serif; }
 
-  /* QUICK ACTIONS */
-  .section-title { font-size: 11px; font-weight: 700; color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 10px; }
+  .section-title { font-size: 11px; font-weight: 700; color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
   .quick-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
-  .action-btn { background: var(--white); border: 2px solid var(--gray-100); border-radius: var(--radius-sm); padding: 12px 10px; cursor: pointer; text-align: left; font-family: 'DM Sans', sans-serif; display: flex; flex-direction: column; gap: 5px; box-shadow: var(--shadow-sm); transition: all 0.2s; }
+  .action-btn { background: var(--white); border: 2px solid var(--gray-100); border-radius: var(--radius-sm); padding: 10px 8px; cursor: pointer; text-align: left; font-family: 'DM Sans', sans-serif; display: flex; flex-direction: column; gap: 4px; box-shadow: var(--shadow-sm); transition: all 0.2s; }
   .action-btn:hover { border-color: var(--primary-light); background: var(--primary-pale); transform: translateY(-2px); }
-  .action-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
   .action-icon { font-size: 18px; }
   .action-label { font-size: 11px; font-weight: 700; color: var(--gray-800); line-height: 1.3; }
 
-  /* CERT ALERTS */
   .cert-card { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow-md); overflow: hidden; }
-  .cert-header { padding: 14px 18px; border-bottom: 1px solid var(--gray-100); display: flex; align-items: center; justify-content: space-between; }
+  .cert-header { padding: 12px 16px; border-bottom: 1px solid var(--gray-100); display: flex; align-items: center; justify-content: space-between; }
   .cert-badge { background: var(--red); color: white; border-radius: 10px; padding: 2px 8px; font-size: 11px; font-weight: 700; }
-  .cert-list { padding: 10px; display: flex; flex-direction: column; gap: 7px; }
+  .cert-list { padding: 8px; display: flex; flex-direction: column; gap: 6px; }
   .cert-item { padding: 10px 12px; border-radius: var(--radius-sm); border-left: 4px solid; }
   .cert-item.urgent { border-color: var(--red); background: #FFF5F5; }
   .cert-item.warning { border-color: var(--orange); background: #FFFAF0; }
   .cert-item.normal { border-color: var(--primary-light); background: var(--primary-pale); }
   .cert-name { font-size: 12px; font-weight: 700; }
   .cert-type { font-size: 11px; color: var(--gray-600); margin-top: 1px; }
-  .cert-days { display: inline-block; margin-top: 5px; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 8px; color: white; }
+  .cert-days { display: inline-block; margin-top: 4px; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 8px; color: white; }
   .cert-days.urgent { background: var(--red); }
   .cert-days.warning { background: var(--orange); }
   .cert-days.normal { background: var(--primary-light); }
-  .view-all { display: block; text-align: center; padding: 11px; font-size: 12px; color: var(--primary); font-weight: 700; cursor: pointer; border-top: 1px solid var(--gray-100); }
+  .view-all { display: block; text-align: center; padding: 10px; font-size: 12px; color: var(--primary); font-weight: 700; cursor: pointer; border-top: 1px solid var(--gray-100); }
 
   @media (max-width: 768px) {
-    .main { grid-template-columns: 1fr; padding: 16px; }
+    .main { grid-template-columns: 1fr; padding: 12px; }
     .quick-grid { grid-template-columns: repeat(2,1fr); }
     .header-date { display: none; }
   }
@@ -124,15 +141,44 @@
 <!-- LOGIN -->
 <div id="login-screen">
   <div class="login-card">
-    <svg width="60" height="60" viewBox="0 0 100 100" fill="none" style="margin:0 auto;display:block">
-      <line x1="50" y1="5" x2="50" y2="95" stroke="#2B6CB0" stroke-width="6" stroke-linecap="round"/>
-      <circle cx="50" cy="8" r="5" fill="#2B6CB0"/>
-      <path d="M30 16 Q35 12 40 14" stroke="#2B6CB0" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <path d="M70 16 Q65 12 60 14" stroke="#2B6CB0" stroke-width="3" fill="none" stroke-linecap="round"/>
-      <path d="M30 30 Q20 45 30 55 Q40 65 50 60 Q60 65 70 55 Q80 45 70 30" stroke="#2B6CB0" stroke-width="4" fill="none" stroke-linecap="round"/>
-      <path d="M35 28 Q15 50 35 68 Q50 78 50 72" stroke="#4299E1" stroke-width="3.5" fill="none" stroke-linecap="round"/>
-      <path d="M65 28 Q85 50 65 68 Q50 78 50 72" stroke="#4299E1" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+
+    <!-- PROPER CADUCEUS SVG -->
+    <svg class="login-logo" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <!-- Main staff -->
+      <rect x="95" y="55" width="10" height="130" rx="5" fill="#2B6CB0"/>
+      <!-- Top ball -->
+      <circle cx="100" cy="50" r="10" fill="#2B6CB0"/>
+
+      <!-- LEFT WING upper -->
+      <path d="M100 70 C85 60 55 50 30 42 C50 48 75 62 100 70Z" fill="#2B6CB0"/>
+      <path d="M100 70 C88 63 65 55 42 50 C62 54 82 64 100 70Z" fill="#4299E1"/>
+      <!-- LEFT WING lower -->
+      <path d="M100 80 C82 72 55 65 32 60 C52 65 78 74 100 80Z" fill="#2B6CB0"/>
+      <path d="M100 80 C86 74 65 68 45 65 C62 68 82 76 100 80Z" fill="#4299E1"/>
+
+      <!-- RIGHT WING upper -->
+      <path d="M100 70 C115 60 145 50 170 42 C150 48 125 62 100 70Z" fill="#2B6CB0"/>
+      <path d="M100 70 C112 63 135 55 158 50 C138 54 118 64 100 70Z" fill="#4299E1"/>
+      <!-- RIGHT WING lower -->
+      <path d="M100 80 C118 72 145 65 168 60 C148 65 122 74 100 80Z" fill="#2B6CB0"/>
+      <path d="M100 80 C114 74 135 68 155 65 C138 68 118 76 100 80Z" fill="#4299E1"/>
+
+      <!-- LEFT SNAKE body -->
+      <path d="M100 90 C80 95 72 105 80 115 C88 125 100 128 100 138 C100 148 88 155 78 158"
+            stroke="#2B6CB0" stroke-width="8" fill="none" stroke-linecap="round"/>
+      <!-- RIGHT SNAKE body -->
+      <path d="M100 90 C120 95 128 105 120 115 C112 125 100 128 100 138 C100 148 112 155 122 158"
+            stroke="#2B6CB0" stroke-width="8" fill="none" stroke-linecap="round"/>
+
+      <!-- LEFT SNAKE head -->
+      <ellipse cx="74" cy="161" rx="8" ry="6" fill="#2B6CB0" transform="rotate(-20 74 161)"/>
+      <!-- RIGHT SNAKE head -->
+      <ellipse cx="126" cy="161" rx="8" ry="6" fill="#2B6CB0" transform="rotate(20 126 161)"/>
+
+      <!-- Bottom tip -->
+      <polygon points="96,185 100,195 104,185" fill="#2B6CB0"/>
     </svg>
+
     <h1 class="login-title">NurseLeader Pro</h1>
     <p class="login-sub">Hospital Management Dashboard</p>
 
@@ -153,7 +199,6 @@
         <option>Nursing Supervisor</option>
       </select>
     </div>
-
     <div class="field">
       <label>🔑 Anthropic API Key</label>
       <div class="pw-wrap">
@@ -163,7 +208,7 @@
       <p class="api-note">🔒 Saved locally on your device only. Never shared.</p>
     </div>
 
-    <div id="form-warning" style="background:#FFF5F5;border:1px solid #FC8181;border-radius:8px;padding:8px 12px;font-size:12px;color:#E53E3E;margin-bottom:10px;display:none;">
+    <div id="form-warning" style="background:#FFF5F5;border:1px solid #FC8181;border-radius:8px;padding:8px 12px;font-size:12px;color:#E53E3E;margin-bottom:8px;display:none;">
       ⚠️ Please fill in all fields before signing in.
     </div>
 
@@ -172,15 +217,20 @@
 </div>
 
 <!-- MAIN APP -->
-<div id="app-screen" style="display:none">
+<div id="app-screen">
   <header class="header">
     <div class="header-left">
-      <svg width="32" height="32" viewBox="0 0 100 100" fill="none">
-        <line x1="50" y1="5" x2="50" y2="95" stroke="#2B6CB0" stroke-width="6" stroke-linecap="round"/>
-        <circle cx="50" cy="8" r="5" fill="#2B6CB0"/>
-        <path d="M30 30 Q20 45 30 55 Q40 65 50 60 Q60 65 70 55 Q80 45 70 30" stroke="#2B6CB0" stroke-width="4" fill="none" stroke-linecap="round"/>
-        <path d="M35 28 Q15 50 35 68 Q50 78 50 72" stroke="#4299E1" stroke-width="3.5" fill="none" stroke-linecap="round"/>
-        <path d="M65 28 Q85 50 65 68 Q50 78 50 72" stroke="#4299E1" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      <svg width="28" height="28" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <rect x="95" y="55" width="10" height="130" rx="5" fill="#2B6CB0"/>
+        <circle cx="100" cy="50" r="10" fill="#2B6CB0"/>
+        <path d="M100 70 C85 60 55 50 30 42 C50 48 75 62 100 70Z" fill="#2B6CB0"/>
+        <path d="M100 70 C115 60 145 50 170 42 C150 48 125 62 100 70Z" fill="#2B6CB0"/>
+        <path d="M100 80 C82 72 55 65 32 60 C52 65 78 74 100 80Z" fill="#2B6CB0"/>
+        <path d="M100 80 C118 72 145 65 168 60 C148 65 122 74 100 80Z" fill="#2B6CB0"/>
+        <path d="M100 90 C80 95 72 105 80 115 C88 125 100 128 100 138 C100 148 88 155 78 158" stroke="#2B6CB0" stroke-width="8" fill="none" stroke-linecap="round"/>
+        <path d="M100 90 C120 95 128 105 120 115 C112 125 100 128 100 138 C100 148 112 155 122 158" stroke="#2B6CB0" stroke-width="8" fill="none" stroke-linecap="round"/>
+        <ellipse cx="74" cy="161" rx="8" ry="6" fill="#2B6CB0" transform="rotate(-20 74 161)"/>
+        <ellipse cx="126" cy="161" rx="8" ry="6" fill="#2B6CB0" transform="rotate(20 126 161)"/>
       </svg>
       <div>
         <div class="brand-name">NurseLeader Pro</div>
@@ -188,9 +238,9 @@
       </div>
     </div>
     <div class="header-right">
-      <div style="font-size:12px;color:#718096" id="hdr-date"></div>
+      <div style="font-size:11px;color:#718096;display:none" id="hdr-date" class="header-date"></div>
       <div style="text-align:right">
-        <div style="font-size:13px;font-weight:600" id="hdr-name"></div>
+        <div style="font-size:12px;font-weight:600" id="hdr-name"></div>
         <div style="font-size:10px;color:#A0AEC0" id="hdr-role"></div>
       </div>
       <div class="avatar" id="hdr-avatar"></div>
@@ -205,7 +255,7 @@
           <h2 id="greet-text"></h2>
           <p id="greet-unit"></p>
         </div>
-        <span style="font-size:40px;opacity:0.3">🏥</span>
+        <span style="font-size:36px;opacity:0.3">🏥</span>
       </div>
 
       <div class="chat-card">
@@ -275,7 +325,6 @@
     vrs: "I need to log a verbal report (VRS) from my staff. Please ask me for the patient name or room, the reporting staff member, and the key information shared, then help me create proper documentation."
   };
 
-  // Load saved API key
   window.onload = () => {
     const saved = localStorage.getItem('nlp_key');
     if (saved) {
@@ -306,20 +355,10 @@
     const unit = document.getElementById('inp-unit').value.trim();
     const role = document.getElementById('inp-role').value;
     const key = document.getElementById('inp-key').value.trim();
-
-    if (!name || !unit || !key) {
-      document.getElementById('form-warning').style.display = 'block';
-      return;
-    }
-
-    if (!key.startsWith('sk-ant')) {
-      alert('Invalid API key. Must start with sk-ant');
-      return;
-    }
-
+    if (!name || !unit || !key) { document.getElementById('form-warning').style.display = 'block'; return; }
+    if (!key.startsWith('sk-ant')) { alert('Invalid API key. Must start with sk-ant'); return; }
     localStorage.setItem('nlp_key', key);
     currentUser = { name, unit, role, key };
-
     const h = new Date().getHours();
     const greeting = h < 12 ? 'Good Morning' : h < 17 ? 'Good Afternoon' : 'Good Evening';
     document.getElementById('greet-text').textContent = `${greeting}, ${name}!`;
@@ -328,15 +367,12 @@
     document.getElementById('hdr-role').textContent = role;
     document.getElementById('hdr-avatar').textContent = name.charAt(0).toUpperCase();
     document.getElementById('hdr-date').textContent = '📅 ' + new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('app-screen').style.display = 'block';
   }
 
   function logout() {
-    currentUser = null;
-    history = [];
-    clearChat();
+    currentUser = null; history = []; clearChat();
     document.getElementById('app-screen').style.display = 'none';
     document.getElementById('login-screen').style.display = 'flex';
   }
@@ -349,68 +385,46 @@
     const inp = document.getElementById('chat-input');
     const text = inp.value.trim();
     if (!text || isLoading) return;
-    inp.value = '';
-    inp.style.height = 'auto';
+    inp.value = ''; inp.style.height = 'auto';
     sendToAI(text, false);
   }
 
   async function sendToAI(userMsg, isSystem) {
     if (isLoading) return;
     isLoading = true;
-
     const div = document.getElementById('chat-messages');
     const empty = document.getElementById('chat-empty');
     if (empty) empty.style.display = 'none';
-
     if (!isSystem) {
       const u = document.createElement('div');
-      u.className = 'msg user';
-      u.textContent = userMsg;
-      div.appendChild(u);
+      u.className = 'msg user'; u.textContent = userMsg; div.appendChild(u);
     }
-
     history.push({ role: 'user', content: userMsg });
-
     const loading = document.createElement('div');
     loading.className = 'msg loading';
     loading.innerHTML = '<div class="dots"><span></span><span></span><span></span></div>';
     div.appendChild(loading);
     div.scrollTop = div.scrollHeight;
     document.getElementById('send-btn').disabled = true;
-
     try {
       const systemPrompt = `You are NurseLeader Pro, an expert AI assistant for US hospital nursing leaders. Current user: ${currentUser.name}, ${currentUser.role}, ${currentUser.unit} unit. Help with incident reports, staff coverage, director reports, patient responses, staff emails, VRS documentation. Be professional, concise, and use proper medical terminology.`;
-
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: history,
-          systemPrompt,
-          apiKey: currentUser.key
-        })
+        body: JSON.stringify({ messages: history, systemPrompt, apiKey: currentUser.key })
       });
-
       const data = await res.json();
       if (!res.ok || !data.text) throw new Error(data.error || 'No response');
-
       history.push({ role: 'assistant', content: data.text });
       loading.remove();
-
       const a = document.createElement('div');
-      a.className = 'msg ai';
-      a.textContent = data.text;
-      div.appendChild(a);
-
+      a.className = 'msg ai'; a.textContent = data.text; div.appendChild(a);
     } catch (err) {
       loading.remove();
       const e = document.createElement('div');
-      e.className = 'msg error';
-      e.textContent = '⚠️ ' + err.message;
-      div.appendChild(e);
+      e.className = 'msg error'; e.textContent = '⚠️ ' + err.message; div.appendChild(e);
       history.pop();
     }
-
     isLoading = false;
     document.getElementById('send-btn').disabled = false;
     div.scrollTop = div.scrollHeight;

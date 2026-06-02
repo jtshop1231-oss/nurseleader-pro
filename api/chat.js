@@ -7,10 +7,10 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    const { messages, systemPrompt, apiKey } = req.body;
-    const key = process.env.ANTHROPIC_API_KEY || apiKey;
+    const { messages, systemPrompt } = req.body;
+    const key = process.env.ANTHROPIC_API_KEY;
 
-    if (!key) return res.status(400).json({ error: 'API key required' });
+    if (!key) return res.status(400).json({ error: 'API key not configured on server' });
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -22,7 +22,6 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
         max_tokens: 1024,
-        // ✅ DITO LANG NAGBAGO - Isang linya lang
         system: `Today's date is: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}. ${systemPrompt}`,
         messages
       })

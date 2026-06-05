@@ -271,6 +271,10 @@ function doLogin(){
 
 function doLogout(){
   currentUser=null;chatHistory=[];msgCount=0;attachedFile=null;
+  var btn=document.getElementById("login-btn");
+  btn.textContent="Sign In →";
+  btn.style.background="#A0AEC0";
+  btn.disabled=true;
   clearChat();
   ["inp-name","inp-unit","inp-other-role","inp-password"].forEach(function(id){ document.getElementById(id).value=""; });
   document.getElementById("inp-role").value="";
@@ -280,6 +284,10 @@ function doLogout(){
   ["inp-name","inp-unit","inp-role","inp-password"].forEach(function(id){ document.getElementById(id).classList.remove("error-border"); });
   document.getElementById("app-screen").style.display="none";
   document.getElementById("login-screen").style.display="flex";
+  var btn=document.getElementById("login-btn");
+  btn.textContent="Sign In →";
+  btn.style.background="#A0AEC0";
+  btn.disabled=true;
   checkForm();
 }
 

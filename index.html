@@ -504,7 +504,9 @@ function sendToAIWithImage(userMsg, imageData, imageType){
       var allMsgs = div.querySelectorAll(".msg.user");
       var lastUserMsg = allMsgs[allMsgs.length - 1];
       if(lastUserMsg){
-        lastUserMsg.scrollIntoView({behavior:"smooth", block:"end"});
+        var rect = lastUserMsg.getBoundingClientRect();
+        var offset = window.pageYOffset + rect.bottom - window.innerHeight + 80;
+        window.scrollTo({top: offset, behavior:"smooth"});
       }
     }, 50);
     msgCount++;
@@ -579,7 +581,9 @@ function sendToAIWithPDF(userMsg, pdfData, fileName){
       var allMsgs = div.querySelectorAll(".msg.user");
       var lastUserMsg = allMsgs[allMsgs.length - 1];
       if(lastUserMsg){
-        lastUserMsg.scrollIntoView({behavior:"smooth", block:"end"});
+        var rect = lastUserMsg.getBoundingClientRect();
+        var offset = window.pageYOffset + rect.bottom - window.innerHeight + 80;
+        window.scrollTo({top: offset, behavior:"smooth"});
       }
     }, 50);
     msgCount++;
@@ -643,7 +647,9 @@ function sendToAI(userMsg,isSystem){
       var allMsgs = div.querySelectorAll(".msg.user");
       var lastUserMsg = allMsgs[allMsgs.length - 1];
       if(lastUserMsg){
-        lastUserMsg.scrollIntoView({behavior:"smooth", block:"end"});
+        var rect = lastUserMsg.getBoundingClientRect();
+        var offset = window.pageYOffset + rect.bottom - window.innerHeight + 80;
+        window.scrollTo({top: offset, behavior:"smooth"});
       }
     }, 50);
     msgCount++;

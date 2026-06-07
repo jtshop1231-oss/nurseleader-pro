@@ -7,7 +7,7 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
-    const { messages, systemPrompt, password } = req.body;
+    const { messages, systemPrompt, password, hasImage } = req.body;
 
     // Verify password
     const correctPassword = process.env.APP_PASSWORD;
@@ -19,6 +19,16 @@ export default async function handler(req, res) {
     const key = process.env.ANTHROPIC_API_KEY;
     if (!key) return res.status(400).json({ error: 'API key not configured on server' });
 
+    const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    
+    // Build request body
+    const requestBody = {
+      model: 'claude-sonnet-4-6',
+      max_tokens: 1024,
+      system: `Today's date is: ${today}. ${systemPrompt}`,
+      messages
+    };
+
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -26,12 +36,7 @@ export default async function handler(req, res) {
         'x-api-key': key,
         'anthropic-version': '2023-06-01'
       },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 1024,
-        system: `Today's date is: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}. ${systemPrompt}`,
-        messages
-      })
+      body: JSON.stringify(requestBody)
     });
 
     const data = await response.json();

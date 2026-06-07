@@ -65,16 +65,9 @@
   .dots span{width:6px;height:6px;background:var(--primary-light);border-radius:50%;animation:bounce 1.2s infinite;}
   .dots span:nth-child(2){animation-delay:0.2s}.dots span:nth-child(3){animation-delay:0.4s}
   @keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
-  .chat-input-area{padding:10px 14px;border-top:1px solid var(--gray-100);display:flex;gap:8px;align-items:center;background:var(--white);position:relative;}
+  .chat-input-area{padding:10px 14px;border-top:1px solid var(--gray-100);display:flex;gap:8px;align-items:center;background:var(--white);}
   .upload-btn{padding:8px 12px;background:#EDF2F7;color:#2B6CB0;border:2px solid #4A5568;border-radius:8px;cursor:pointer;font-size:20px;font-weight:700;line-height:1;flex-shrink:0;}
-  .upload-menu{position:absolute;bottom:60px;left:14px;background:white;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.2);border:1px solid #E2E8F0;z-index:999;overflow:hidden;display:none;}
-  .upload-menu.show{display:block;}
-  .upload-menu-item{display:flex;align-items:center;gap:10px;padding:12px 16px;font-size:14px;font-weight:600;color:#2D3748;cursor:pointer;border-bottom:1px solid #EDF2F7;font-family:"DM Sans",sans-serif;}
-  .upload-menu-item:last-child{border-bottom:none;}
-  .upload-menu-item:hover{background:#EBF8FF;}
-  .upload-menu-icon{font-size:18px;}
-  .upload-overlay{position:fixed;inset:0;z-index:998;display:none;}
-  .upload-overlay.show{display:block;}
+
   .chat-input{flex:1;padding:9px 12px;border:2px solid #718096;border-radius:8px;font-family:"DM Sans",sans-serif;font-size:13px;outline:none;resize:none;color:#1A202C;}
   .chat-input::placeholder{color:#4A5568;}
   .chat-input:focus{border-color:var(--primary-light);}
@@ -143,16 +136,8 @@
         <div class="chat-messages" id="chat-messages"><div class="chat-empty" id="chat-empty"><span style="font-size:32px;opacity:0.4">&#128172;</span><p style="font-size:13px;color:#2D3748;font-weight:600">How can I help you today?</p><small style="font-size:11px;color:#4A5568;font-weight:500">Click any quick action below or type your message</small></div></div>
         <div id="file-preview-bar" class="file-preview"><span id="file-name-display"></span><span class="remove-file" onclick="removeFile()">&#10006;</span></div>
         <div class="chat-input-area">
-          <button class="upload-btn" onclick="toggleUploadMenu()" title="Attach file">+</button>
-          <input type="file" id="file-input-image" accept="image/*" style="display:none" onchange="handleFileUpload(event)">
-          <input type="file" id="file-input-doc" accept=".pdf,.txt,.doc,.docx" style="display:none" onchange="handleFileUpload(event)">
-          <input type="file" id="file-input-drive" accept="*/*" style="display:none" onchange="handleFileUpload(event)">
-          <div class="upload-overlay" id="upload-overlay" onclick="closeUploadMenu()"></div>
-          <div class="upload-menu" id="upload-menu">
-            <div class="upload-menu-item" onclick="openFilePicker('image')"><span class="upload-menu-icon">&#128247;</span> Photo Library</div>
-            <div class="upload-menu-item" onclick="openFilePicker('doc')"><span class="upload-menu-icon">&#128196;</span> Choose File (PDF/TXT)</div>
-            <div class="upload-menu-item" onclick="openFilePicker('drive')"><span class="upload-menu-icon">&#128194;</span> Google Drive</div>
-          </div>
+          <button class="upload-btn" onclick="document.getElementById('file-input').click()" title="Attach file">+</button>
+          <input type="file" id="file-input" accept="image/*,.pdf,.txt,.doc,.docx" capture="none" style="display:none" onchange="handleFileUpload(event)">
           <textarea class="chat-input" id="chat-input" placeholder="Type your message..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
           <button class="clear-btn" onclick="clearChat()">Clear</button>
           <button class="send-btn" id="send-btn" onclick="sendMessage()">&#10148;</button>
@@ -307,28 +292,21 @@ function doLogout(){
   checkForm();
 }
 
-function toggleUploadMenu(){
-  var menu=document.getElementById("upload-menu");
-  var overlay=document.getElementById("upload-overlay");
-  menu.classList.toggle("show");
-  overlay.classList.toggle("show");
-}
-
-function closeUploadMenu(){
-  document.getElementById("upload-menu").classList.remove("show");
-  document.getElementById("upload-overlay").classList.remove("show");
-}
-
-function openFilePicker(type){
-  closeUploadMenu();
-  if(type==="image") document.getElementById("file-input-image").click();
-  else if(type==="doc") document.getElementById("file-input-doc").click();
-  else if(type==="drive") document.getElementById("file-input-drive").click();
-}
-
 function handleFileUpload(e){
   var file=e.target.files[0];
   if(!file)return;
+  // Check if this came from camera (image/jpeg with no album info) - show WIP notice
+  if(file.type==="image/jpeg" && file.name==="image.jpg"){
+    var div=document.getElementById("chat-messages");
+    var empty=document.getElementById("chat-empty");
+    if(empty)empty.style.display="none";
+    var w=document.createElement("div");
+    w.className="msg ai";
+    w.style.cssText="background:#FFFBEB;border:2px solid #D69E2E;max-width:90%;align-self:center;text-align:center;";
+    w.innerHTML="<strong>&#9888;&#65039; Work in Progress</strong><br>Camera capture is not yet available. Please use <strong>Photo Library</strong> to upload an existing photo.";
+    div.appendChild(w);div.scrollTop=div.scrollHeight;
+    e.target.value="";return;
+  }
   var maxSize=5*1024*1024; // 5MB limit
   if(file.size>maxSize){
     alert("File too large. Please upload files under 5MB.");

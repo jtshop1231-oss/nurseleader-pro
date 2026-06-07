@@ -295,7 +295,7 @@ function doLogout(){
 function handleFileUpload(e){
   var file=e.target.files[0];
   if(!file)return;
-  var maxSize=5*1024*1024; // 5MB limit
+  var maxSize=5*1024*1024;
   if(file.size>maxSize){
     alert("File too large. Please upload files under 5MB.");
     e.target.value="";
@@ -305,16 +305,16 @@ function handleFileUpload(e){
   reader.onload=function(evt){
     var content=evt.target.result;
     if(file.type.startsWith("image/")){
-      // Store base64 without data URL prefix
-      attachedFile={name:file.name,content:content.split(",")[1],type:file.type,isImage:true};
+      attachedFile={name:file.name,content:content.split(",")[1],dataUrl:content,type:file.type,isImage:true};
+      // Show image preview in file bar
+      document.getElementById("file-name-display").innerHTML='<img src="'+content+'" style="width:40px;height:40px;object-fit:cover;border-radius:4px;"> '+file.name;
     } else if(file.type==="application/pdf"){
-      // Store base64 for PDF
       attachedFile={name:file.name,content:content.split(",")[1],type:file.type,isPDF:true};
+      document.getElementById("file-name-display").textContent="PDF: "+file.name;
     } else {
-      // Plain text
       attachedFile={name:file.name,content:content,type:file.type,isText:true};
+      document.getElementById("file-name-display").textContent="File: "+file.name;
     }
-    document.getElementById("file-name-display").textContent="File: "+file.name;
     document.getElementById("file-preview-bar").style.display="flex";
   };
   if(file.type.startsWith("image/")||file.type==="application/pdf"){
@@ -342,8 +342,28 @@ function sendMessage(){
     var userMsg=t||"Please analyze this image and help me with it.";
     var imgData=attachedFile.content;
     var imgType=attachedFile.type;
+    var dataUrl=attachedFile.dataUrl;
     removeFile();
     inp.value=""; inp.style.height="auto";
+    // Show image in chat first
+    var div=document.getElementById("chat-messages");
+    var empty=document.getElementById("chat-empty");
+    if(empty)empty.style.display="none";
+    var u=document.createElement("div");
+    u.style.cssText="align-self:flex-end;display:flex;flex-direction:column;gap:6px;max-width:85%;";
+    var imgEl=document.createElement("img");
+    imgEl.src=dataUrl;
+    imgEl.style.cssText="max-width:220px;max-height:220px;border-radius:10px;object-fit:cover;align-self:flex-end;";
+    u.appendChild(imgEl);
+    if(userMsg && userMsg!=="Please analyze this image and help me with it."){
+      var txt=document.createElement("div");
+      txt.className="msg user";
+      txt.style.cssText="margin:0;align-self:flex-end;";
+      txt.textContent=userMsg;
+      u.appendChild(txt);
+    }
+    div.appendChild(u);
+    u.scrollIntoView({behavior:"smooth",block:"start"});
     sendToAIWithImage(userMsg, imgData, imgType);
   } else if(attachedFile && attachedFile.isPDF){
     var userMsg=t||"Please analyze this PDF document and help me with it.";
@@ -446,23 +466,7 @@ function sendToAIWithImage(userMsg, imageData, imageType){
     div.appendChild(e);div.scrollTop=div.scrollHeight;return;
   }
   isLoading=true;
-  var empty=document.getElementById("chat-empty");
-  if(empty)empty.style.display="none";
-  // Show image preview + text in chat
-  var u=document.createElement("div");
-  u.className="msg user";
-  u.style.cssText="max-width:85%;align-self:flex-end;display:flex;flex-direction:column;gap:6px;";
-  var imgEl=document.createElement("img");
-  imgEl.src="data:"+imageType+";base64,"+imageData;
-  imgEl.style.cssText="max-width:200px;max-height:200px;border-radius:8px;object-fit:cover;";
-  u.appendChild(imgEl);
-  if(userMsg){
-    var txt=document.createElement("div");
-    txt.style.cssText="background:#2B6CB0;color:white;padding:8px 12px;border-radius:8px;font-size:13px;";
-    txt.textContent=userMsg;
-    u.appendChild(txt);
-  }
-  div.appendChild(u);
+  // Image already shown in chat by sendMessage()
   var loading=document.createElement("div");
   loading.className="msg loading";
   loading.innerHTML='<div class="dots"><span></span><span></span><span></span></div>';

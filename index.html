@@ -501,7 +501,12 @@ function sendToAIWithImage(userMsg, imageData, imageType){
     a.appendChild(renderText(result.data.text));
     div.appendChild(a);
     setTimeout(function(){
-      div.scrollTop = a.offsetTop - 10;
+      // Scroll so user message is visible at top, AI answer starts below
+      var allMsgs = div.querySelectorAll(".msg.user");
+      var lastUserMsg = allMsgs[allMsgs.length - 1];
+      if(lastUserMsg){
+        div.scrollTop = lastUserMsg.offsetTop - 8;
+      }
     }, 50);
     msgCount++;
     var remaining=MAX_MSGS-msgCount;
@@ -572,7 +577,12 @@ function sendToAIWithPDF(userMsg, pdfData, fileName){
     a.appendChild(renderText(result.data.text));
     div.appendChild(a);
     setTimeout(function(){
-      div.scrollTop = a.offsetTop - 10;
+      // Scroll so user message is visible at top, AI answer starts below
+      var allMsgs = div.querySelectorAll(".msg.user");
+      var lastUserMsg = allMsgs[allMsgs.length - 1];
+      if(lastUserMsg){
+        div.scrollTop = lastUserMsg.offsetTop - 8;
+      }
     }, 50);
     msgCount++;
     var remaining=MAX_MSGS-msgCount;
@@ -632,7 +642,12 @@ function sendToAI(userMsg,isSystem){
     a.appendChild(renderText(result.data.text));
     div.appendChild(a);
     setTimeout(function(){
-      div.scrollTop = a.offsetTop - 10;
+      // Scroll so user message is visible at top, AI answer starts below
+      var allMsgs = div.querySelectorAll(".msg.user");
+      var lastUserMsg = allMsgs[allMsgs.length - 1];
+      if(lastUserMsg){
+        div.scrollTop = lastUserMsg.offsetTop - 8;
+      }
     }, 50);
     msgCount++;
     var remaining=MAX_MSGS-msgCount;

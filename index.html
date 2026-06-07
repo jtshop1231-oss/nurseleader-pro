@@ -136,7 +136,7 @@
         <div id="file-preview-bar" class="file-preview"><span id="file-name-display"></span><span class="remove-file" onclick="removeFile()">&#10006;</span></div>
         <div class="chat-input-area">
           <button class="upload-btn" onclick="document.getElementById('file-input').click()" title="Attach file">+</button>
-          <input type="file" id="file-input" accept="image/*,.pdf,.doc,.docx,.txt" style="display:none" onchange="handleFileUpload(event)">
+          <input type="file" id="file-input" accept="image/*,.txt,.pdf,.doc,.docx" style="display:none" onchange="handleFileUpload(event)">
           <textarea class="chat-input" id="chat-input" placeholder="Type your message..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
           <button class="clear-btn" onclick="clearChat()">Clear</button>
           <button class="send-btn" id="send-btn" onclick="sendMessage()">&#10148;</button>
@@ -294,15 +294,29 @@ function doLogout(){
 function handleFileUpload(e){
   var file=e.target.files[0];
   if(!file)return;
+  var maxSize=5*1024*1024; // 5MB limit
+  if(file.size>maxSize){
+    alert("File too large. Please upload files under 5MB.");
+    e.target.value="";
+    return;
+  }
   var reader=new FileReader();
   reader.onload=function(evt){
     var content=evt.target.result;
-    // For images, store as data URL; for text files store as text
-    attachedFile={name:file.name,content:content,type:file.type};
+    if(file.type.startsWith("image/")){
+      // Store base64 without data URL prefix
+      attachedFile={name:file.name,content:content.split(",")[1],type:file.type,isImage:true};
+    } else if(file.type==="application/pdf"){
+      // Store base64 for PDF
+      attachedFile={name:file.name,content:content.split(",")[1],type:file.type,isPDF:true};
+    } else {
+      // Plain text
+      attachedFile={name:file.name,content:content,type:file.type,isText:true};
+    }
     document.getElementById("file-name-display").textContent="File: "+file.name;
     document.getElementById("file-preview-bar").style.display="flex";
   };
-  if(file.type.startsWith("image/")){
+  if(file.type.startsWith("image/")||file.type==="application/pdf"){
     reader.readAsDataURL(file);
   } else {
     reader.readAsText(file);
@@ -323,13 +337,20 @@ function sendMessage(){
   var inp=document.getElementById("chat-input");
   var t=inp.value.trim();
   if((!t&&!attachedFile)||isLoading)return;
-  if(attachedFile && attachedFile.type && attachedFile.type.startsWith("image/")){
-    var imageData=attachedFile.content.split(",")[1];
-    var imageType=attachedFile.type;
+  if(attachedFile && attachedFile.isImage){
     var userMsg=t||"Please analyze this image and help me with it.";
+    var imgData=attachedFile.content;
+    var imgType=attachedFile.type;
     removeFile();
     inp.value=""; inp.style.height="auto";
-    sendToAIWithImage(userMsg, imageData, imageType);
+    sendToAIWithImage(userMsg, imgData, imgType);
+  } else if(attachedFile && attachedFile.isPDF){
+    var userMsg=t||"Please analyze this PDF document and help me with it.";
+    var pdfData=attachedFile.content;
+    var fname=attachedFile.name;
+    removeFile();
+    inp.value=""; inp.style.height="auto";
+    sendToAIWithPDF(userMsg, pdfData, fname);
   } else {
     var msg=t;
     if(attachedFile){
@@ -461,6 +482,73 @@ function sendToAIWithImage(userMsg, imageData, imageType){
     loading.remove();
     if(!result.data.text)throw new Error(result.data.error||"No response");
     chatHistory.push({role:"user",content:userMsg+" [Image]"});
+    chatHistory.push({role:"assistant",content:result.data.text});
+    var a=document.createElement("div");
+    a.className="msg ai";
+    a.appendChild(renderText(result.data.text));
+    div.appendChild(a);
+    msgCount++;
+    var remaining=MAX_MSGS-msgCount;
+    if(remaining<=5&&remaining>0){
+      var w=document.createElement("div");
+      w.style.cssText="background:#FFFBEB;border:2px solid #D69E2E;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:700;color:#744210;align-self:center;text-align:center;max-width:95%;";
+      w.textContent="Warning: "+remaining+" message"+(remaining===1?"":"s")+" remaining in this session.";
+      div.appendChild(w);
+    }
+  }).catch(function(err){
+    loading.remove();
+    var e=document.createElement("div");
+    e.className="msg error";e.textContent="Error: "+err.message;div.appendChild(e);
+  }).finally(function(){
+    isLoading=false;
+    document.getElementById("send-btn").disabled=false;
+    div.scrollTop=div.scrollHeight;
+  });
+}
+
+function sendToAIWithPDF(userMsg, pdfData, fileName){
+  if(isLoading)return;
+  var div=document.getElementById("chat-messages");
+  if(msgCount>=MAX_MSGS){
+    var e=document.createElement("div");
+    e.className="msg error";
+    e.textContent="You have reached the maximum messages for this session. Please refresh to start a new session.";
+    div.appendChild(e);div.scrollTop=div.scrollHeight;return;
+  }
+  isLoading=true;
+  var empty=document.getElementById("chat-empty");
+  if(empty)empty.style.display="none";
+  var u=document.createElement("div");
+  u.className="msg user";
+  u.style.cssText="max-width:85%;align-self:flex-end;display:flex;flex-direction:column;gap:6px;";
+  var fileDiv=document.createElement("div");
+  fileDiv.style.cssText="background:#2B6CB0;color:white;padding:8px 12px;border-radius:8px;font-size:13px;";
+  fileDiv.textContent="PDF: "+fileName+(userMsg?" - "+userMsg:"");
+  u.appendChild(fileDiv);
+  div.appendChild(u);
+  var loading=document.createElement("div");
+  loading.className="msg loading";
+  loading.innerHTML='<div class="dots"><span></span><span></span><span></span></div>';
+  div.appendChild(loading);div.scrollTop=div.scrollHeight;
+  document.getElementById("send-btn").disabled=true;
+  var sp="You are NurseLeader Pro, an expert AI assistant for US hospital nursing leaders. Current user: "+currentUser.name+", "+currentUser.role+", "+currentUser.unit+" unit. Help with incident reports, staff coverage, director reports, patient responses, staff emails, VRS documentation. Be professional, concise, and use proper medical terminology. Use markdown formatting: headers, bold, bullet points, and tables where helpful.";
+  fetch("/api/chat",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      messages:[{role:"user",content:userMsg}],
+      systemPrompt:sp,
+      password:currentUser.password,
+      fileContent:pdfData,
+      fileName:fileName,
+      fileType:"application/pdf"
+    })
+  }).then(function(res){
+    return res.json().then(function(d){return{status:res.status,data:d};});
+  }).then(function(result){
+    loading.remove();
+    if(!result.data.text)throw new Error(result.data.error||"No response");
+    chatHistory.push({role:"user",content:userMsg+" [PDF: "+fileName+"]"});
     chatHistory.push({role:"assistant",content:result.data.text});
     var a=document.createElement("div");
     a.className="msg ai";

@@ -137,7 +137,7 @@
         <div id="file-preview-bar" class="file-preview"><span id="file-name-display"></span><span class="remove-file" onclick="removeFile()">&#10006;</span></div>
         <div class="chat-input-area">
           <button class="upload-btn" onclick="document.getElementById('file-input').click()" title="Attach file">+</button>
-          <input type="file" id="file-input" accept="image/*,.pdf,.txt,.doc,.docx" capture="none" style="display:none" onchange="handleFileUpload(event)">
+          <input type="file" id="file-input" accept="image/*,.pdf,.txt,.doc,.docx" style="display:none" onchange="handleFileUpload(event)">
           <textarea class="chat-input" id="chat-input" placeholder="Type your message..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
           <button class="clear-btn" onclick="clearChat()">Clear</button>
           <button class="send-btn" id="send-btn" onclick="sendMessage()">&#10148;</button>
@@ -295,18 +295,6 @@ function doLogout(){
 function handleFileUpload(e){
   var file=e.target.files[0];
   if(!file)return;
-  // Check if this came from camera (image/jpeg with no album info) - show WIP notice
-  if(file.type==="image/jpeg" && file.name==="image.jpg"){
-    var div=document.getElementById("chat-messages");
-    var empty=document.getElementById("chat-empty");
-    if(empty)empty.style.display="none";
-    var w=document.createElement("div");
-    w.className="msg ai";
-    w.style.cssText="background:#FFFBEB;border:2px solid #D69E2E;max-width:90%;align-self:center;text-align:center;";
-    w.innerHTML="<strong>&#9888;&#65039; Work in Progress</strong><br>Camera capture is not yet available. Please use <strong>Photo Library</strong> to upload an existing photo.";
-    div.appendChild(w);div.scrollTop=div.scrollHeight;
-    e.target.value="";return;
-  }
   var maxSize=5*1024*1024; // 5MB limit
   if(file.size>maxSize){
     alert("File too large. Please upload files under 5MB.");

@@ -292,10 +292,21 @@ function doLogout(){
 }
 
 function handleFileUpload(e){
-  attachedFile=e.target.files[0];
-  if(!attachedFile)return;
-  document.getElementById("file-name-display").textContent="File: "+attachedFile.name;
-  document.getElementById("file-preview-bar").style.display="flex";
+  var file=e.target.files[0];
+  if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(evt){
+    var content=evt.target.result;
+    // For images, store as data URL; for text files store as text
+    attachedFile={name:file.name,content:content,type:file.type};
+    document.getElementById("file-name-display").textContent="File: "+file.name;
+    document.getElementById("file-preview-bar").style.display="flex";
+  };
+  if(file.type.startsWith("image/")){
+    reader.readAsDataURL(file);
+  } else {
+    reader.readAsText(file);
+  }
   e.target.value="";
 }
 
@@ -312,10 +323,22 @@ function sendMessage(){
   var inp=document.getElementById("chat-input");
   var t=inp.value.trim();
   if((!t&&!attachedFile)||isLoading)return;
-  var msg=t;
-  if(attachedFile){ msg=(t?t+" ":"")+"[File: "+attachedFile.name+"]"; removeFile(); }
-  inp.value=""; inp.style.height="auto";
-  sendToAI(msg,false);
+  if(attachedFile && attachedFile.type && attachedFile.type.startsWith("image/")){
+    var imageData=attachedFile.content.split(",")[1];
+    var imageType=attachedFile.type;
+    var userMsg=t||"Please analyze this image and help me with it.";
+    removeFile();
+    inp.value=""; inp.style.height="auto";
+    sendToAIWithImage(userMsg, imageData, imageType);
+  } else {
+    var msg=t;
+    if(attachedFile){
+      msg=(t?t+"\n\n":"")+"I have uploaded a file. Here is its content:\n\nFile: "+attachedFile.name+"\n---\n"+attachedFile.content+"\n---\nPlease help me with this.";
+      removeFile();
+    }
+    inp.value=""; inp.style.height="auto";
+    sendToAI(msg,false);
+  }
 }
 
 function renderText(text){
@@ -389,6 +412,66 @@ function formatInline(text){
   // Italic
   text=text.replace(/\*([^*]+)\*/g,"<em>$1</em>");
   return text;
+}
+
+function sendToAIWithImage(userMsg, imageData, imageType){
+  if(isLoading)return;
+  var div=document.getElementById("chat-messages");
+  if(msgCount>=MAX_MSGS){
+    var e=document.createElement("div");
+    e.className="msg error";
+    e.textContent="You have reached the maximum messages for this session. Please refresh to start a new session.";
+    div.appendChild(e);div.scrollTop=div.scrollHeight;return;
+  }
+  isLoading=true;
+  var empty=document.getElementById("chat-empty");
+  if(empty)empty.style.display="none";
+  var u=document.createElement("div");
+  u.className="msg user";
+  u.textContent=userMsg+" [Image attached]";
+  div.appendChild(u);
+  var loading=document.createElement("div");
+  loading.className="msg loading";
+  loading.innerHTML='<div class="dots"><span></span><span></span><span></span></div>';
+  div.appendChild(loading);div.scrollTop=div.scrollHeight;
+  document.getElementById("send-btn").disabled=true;
+  var sp="You are NurseLeader Pro, an expert AI assistant for US hospital nursing leaders. Current user: "+currentUser.name+", "+currentUser.role+", "+currentUser.unit+" unit. Help with incident reports, staff coverage, director reports, patient responses, staff emails, VRS documentation. Be professional, concise, and use proper medical terminology. Use markdown formatting: headers, bold, bullet points, and tables where helpful.";
+  var imageMessage={role:"user",content:[
+    {type:"image",source:{type:"base64",media_type:imageType,data:imageData}},
+    {type:"text",text:userMsg}
+  ]};
+  fetch("/api/chat",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({messages:[imageMessage],systemPrompt:sp,password:currentUser.password,hasImage:true})
+  }).then(function(res){
+    return res.json().then(function(d){return{status:res.status,data:d};});
+  }).then(function(result){
+    loading.remove();
+    if(!result.data.text)throw new Error(result.data.error||"No response");
+    chatHistory.push({role:"user",content:userMsg+" [Image]"});
+    chatHistory.push({role:"assistant",content:result.data.text});
+    var a=document.createElement("div");
+    a.className="msg ai";
+    a.appendChild(renderText(result.data.text));
+    div.appendChild(a);
+    msgCount++;
+    var remaining=MAX_MSGS-msgCount;
+    if(remaining<=5&&remaining>0){
+      var w=document.createElement("div");
+      w.style.cssText="background:#FFFBEB;border:2px solid #D69E2E;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:700;color:#744210;align-self:center;text-align:center;max-width:95%;";
+      w.textContent="Warning: "+remaining+" message"+(remaining===1?"":"s")+" remaining in this session.";
+      div.appendChild(w);
+    }
+  }).catch(function(err){
+    loading.remove();
+    var e=document.createElement("div");
+    e.className="msg error";e.textContent="Error: "+err.message;div.appendChild(e);
+  }).finally(function(){
+    isLoading=false;
+    document.getElementById("send-btn").disabled=false;
+    div.scrollTop=div.scrollHeight;
+  });
 }
 
 function sendToAI(userMsg,isSystem){

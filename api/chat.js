@@ -1,5 +1,3 @@
-import Anthropic from '@anthropic-ai/sdk';
-
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -26,9 +24,9 @@ export default async function handler(req, res) {
 
     let finalMessages = messages;
 
-    // Handle PDF via Anthropic's native PDF support
+    // Handle PDF
     if (fileType === 'application/pdf' && fileContent) {
-      const pdfMessage = {
+      finalMessages = [{
         role: 'user',
         content: [
           {
@@ -41,15 +39,14 @@ export default async function handler(req, res) {
           },
           {
             type: 'text',
-            text: messages[messages.length - 1]?.content || 'Please analyze this document and help me with it.'
+            text: messages[messages.length - 1]?.content || 'Please analyze this PDF document and help me with it.'
           }
         ]
-      };
-      finalMessages = [pdfMessage];
+      }];
     }
     // Handle image
     else if (hasImage && fileContent && fileType) {
-      const imgMessage = {
+      finalMessages = [{
         role: 'user',
         content: [
           {
@@ -62,21 +59,26 @@ export default async function handler(req, res) {
           },
           {
             type: 'text',
-            text: messages[messages.length - 1]?.content || 'Please analyze this image.'
+            text: messages[messages.length - 1]?.content || 'Please analyze this image and help me with it.'
           }
         ]
-      };
-      finalMessages = [imgMessage];
+      }];
+    }
+
+    const headers = {
+      'Content-Type': 'application/json',
+      'x-api-key': key,
+      'anthropic-version': '2023-06-01'
+    };
+
+    // Add PDF beta header if needed
+    if (fileType === 'application/pdf') {
+      headers['anthropic-beta'] = 'pdfs-2024-09-25';
     }
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': key,
-        'anthropic-version': '2023-06-01',
-        'anthropic-beta': 'pdfs-2024-09-25'
-      },
+      headers,
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 1024,

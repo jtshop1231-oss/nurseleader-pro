@@ -550,10 +550,11 @@ function sendToAIWithPDF(userMsg, pdfData, fileName){
   fileDiv.textContent="PDF: "+fileName+(userMsg?" - "+userMsg:"");
   u.appendChild(fileDiv);
   div.appendChild(u);
+  u.scrollIntoView({behavior:"smooth",block:"end"});
   var loading=document.createElement("div");
   loading.className="msg loading";
   loading.innerHTML='<div class="dots"><span></span><span></span><span></span></div>';
-  div.appendChild(loading);div.scrollTop=div.scrollHeight;
+  div.appendChild(loading);
   document.getElementById("send-btn").disabled=true;
   var sp="You are NurseLeader Pro, an advanced AI assistant for hospital nursing leaders and healthcare professionals. Current user: "+currentUser.name+", "+currentUser.role+", "+currentUser.unit+" unit. You have extensive expertise in ALL medical and healthcare fields including but not limited to: clinical nursing practice, cardiac rhythms and EKG/ECG interpretation, lab results and diagnostics, pharmacology and medications, patient assessment and care planning, infection control, emergency protocols, ACLS/BLS/PALS guidelines, incident reports, staff coverage and scheduling, director and administrative reports, patient complaint responses, staff communications, VRS documentation, hospital policies and bylaws, Joint Commission standards, CMS regulations, HIPAA compliance, state nursing board regulations, scope of practice guidelines, medical-legal documentation, and all other hospital administrative and clinical matters. Always respond in the same language the user writes in — if they write in Filipino/Tagalog, respond in Filipino/Tagalog; if in English, respond in English; if mixed, respond in mixed language. Be professional, thorough, and use proper medical terminology. Use markdown formatting: headers, bold, bullet points, and tables where appropriate.";
   fetch("/api/chat",{

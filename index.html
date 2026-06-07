@@ -8,7 +8,7 @@
 <style>
   :root{--primary:#2B6CB0;--primary-light:#4299E1;--primary-pale:#EBF8FF;--primary-bg:#F0F7FF;--white:#FFFFFF;--gray-100:#EDF2F7;--gray-200:#E2E8F0;--gray-400:#A0AEC0;--gray-600:#718096;--gray-800:#2D3748;--red:#E53E3E;--orange:#DD6B20;--green:#38A169;--shadow-sm:0 1px 3px rgba(0,0,0,0.08);--shadow-md:0 4px 16px rgba(43,108,176,0.10);--radius:14px;--radius-sm:8px;}
   *{box-sizing:border-box;margin:0;padding:0;}
-  html,body{height:100%;width:100%;font-family:"DM Sans",sans-serif;background:var(--primary-bg);color:var(--gray-800);overflow:hidden;}
+  html,body{width:100%;font-family:"DM Sans",sans-serif;background:var(--primary-bg);color:var(--gray-800);}
   #login-screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#2B6CB0,#2C5282,#1A365D);overflow:hidden;}
   .login-card{background:var(--white);border-radius:20px;padding:24px 24px 28px;width:calc(100% - 32px);max-width:400px;box-shadow:0 8px 32px rgba(43,108,176,0.20);text-align:center;max-height:calc(100vh - 40px);overflow-y:auto;border:2px solid #90CDF4;}
   .login-logo{width:80px;height:80px;margin:0 auto 10px;display:block;object-fit:contain;}
@@ -26,7 +26,7 @@
   .show-pw-btn{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:12px;color:#4A5568;font-family:"DM Sans",sans-serif;font-weight:600;}
   .login-btn{width:100%;padding:13px;background:var(--primary);color:white;border:none;border-radius:var(--radius-sm);font-family:"DM Sans",sans-serif;font-size:15px;font-weight:700;cursor:pointer;margin-top:8px;transition:background 0.2s;}
   .login-btn:disabled{background:#A0AEC0;cursor:not-allowed;}
-  #app-screen{display:none;height:100vh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+  #app-screen{display:none;}
   .header{background:var(--white);border-bottom:1px solid var(--gray-100);padding:0 16px;height:56px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow-sm);position:sticky;top:0;z-index:100;}
   .header-left{display:flex;align-items:center;gap:8px;}
   .brand-name{font-family:"DM Serif Display",serif;font-size:16px;color:#1A4A7A;font-weight:700;}
@@ -505,7 +505,8 @@ function sendToAIWithImage(userMsg, imageData, imageType){
       var lastUserMsg = allMsgs[allMsgs.length - 1];
       if(lastUserMsg){
         var rect = lastUserMsg.getBoundingClientRect();
-        var offset = window.pageYOffset + rect.bottom - window.innerHeight + 80;
+        var headerHeight = 56;
+        var offset = window.pageYOffset + rect.top - headerHeight - 10;
         window.scrollTo({top: offset, behavior:"smooth"});
       }
     }, 50);
@@ -582,7 +583,8 @@ function sendToAIWithPDF(userMsg, pdfData, fileName){
       var lastUserMsg = allMsgs[allMsgs.length - 1];
       if(lastUserMsg){
         var rect = lastUserMsg.getBoundingClientRect();
-        var offset = window.pageYOffset + rect.bottom - window.innerHeight + 80;
+        var headerHeight = 56;
+        var offset = window.pageYOffset + rect.top - headerHeight - 10;
         window.scrollTo({top: offset, behavior:"smooth"});
       }
     }, 50);
@@ -648,7 +650,8 @@ function sendToAI(userMsg,isSystem){
       var lastUserMsg = allMsgs[allMsgs.length - 1];
       if(lastUserMsg){
         var rect = lastUserMsg.getBoundingClientRect();
-        var offset = window.pageYOffset + rect.bottom - window.innerHeight + 80;
+        var headerHeight = 56;
+        var offset = window.pageYOffset + rect.top - headerHeight - 10;
         window.scrollTo({top: offset, behavior:"smooth"});
       }
     }, 50);

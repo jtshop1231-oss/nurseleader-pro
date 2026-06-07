@@ -306,16 +306,38 @@ function handleFileUpload(e){
     var content=evt.target.result;
     if(file.type.startsWith("image/")){
       attachedFile={name:file.name,content:content.split(",")[1],dataUrl:content,type:file.type,isImage:true};
-      // Show image preview in file bar
-      document.getElementById("file-name-display").innerHTML='<img src="'+content+'" style="width:40px;height:40px;object-fit:cover;border-radius:4px;"> '+file.name;
+      // Show image directly in chat box
+      var div=document.getElementById("chat-messages");
+      var empty=document.getElementById("chat-empty");
+      if(empty)empty.style.display="none";
+      // Remove previous preview if any
+      var oldPreview=document.getElementById("img-preview-in-chat");
+      if(oldPreview)oldPreview.remove();
+      var previewWrap=document.createElement("div");
+      previewWrap.id="img-preview-in-chat";
+      previewWrap.style.cssText="align-self:flex-end;display:flex;flex-direction:column;align-items:flex-end;gap:4px;";
+      var imgEl=document.createElement("img");
+      imgEl.src=content;
+      imgEl.style.cssText="max-width:220px;max-height:220px;border-radius:10px;object-fit:cover;border:2px solid #BEE3F8;";
+      var label=document.createElement("div");
+      label.style.cssText="font-size:10px;color:#718096;";
+      label.textContent="Image ready - type your question below";
+      previewWrap.appendChild(imgEl);
+      previewWrap.appendChild(label);
+      div.appendChild(previewWrap);
+      previewWrap.scrollIntoView({behavior:"smooth",block:"start"});
+      // Show filename in file bar
+      document.getElementById("file-name-display").textContent=file.name;
+      document.getElementById("file-preview-bar").style.display="flex";
     } else if(file.type==="application/pdf"){
       attachedFile={name:file.name,content:content.split(",")[1],type:file.type,isPDF:true};
       document.getElementById("file-name-display").textContent="PDF: "+file.name;
+      document.getElementById("file-preview-bar").style.display="flex";
     } else {
       attachedFile={name:file.name,content:content,type:file.type,isText:true};
       document.getElementById("file-name-display").textContent="File: "+file.name;
+      document.getElementById("file-preview-bar").style.display="flex";
     }
-    document.getElementById("file-preview-bar").style.display="flex";
   };
   if(file.type.startsWith("image/")||file.type==="application/pdf"){
     reader.readAsDataURL(file);
@@ -328,6 +350,8 @@ function handleFileUpload(e){
 function removeFile(){
   attachedFile=null;
   document.getElementById("file-preview-bar").style.display="none";
+  var oldPreview=document.getElementById("img-preview-in-chat");
+  if(oldPreview)oldPreview.remove();
 }
 
 function quickAction(type){ sendToAI(prompts[type],true); }
@@ -343,27 +367,21 @@ function sendMessage(){
     var imgData=attachedFile.content;
     var imgType=attachedFile.type;
     var dataUrl=attachedFile.dataUrl;
+    // Convert preview to final user message bubble
+    var oldPreview=document.getElementById("img-preview-in-chat");
+    if(oldPreview){
+      oldPreview.removeAttribute("id");
+      // Add user text message below image if any
+      if(t){
+        var txt=document.createElement("div");
+        txt.className="msg user";
+        txt.style.cssText="margin:0;align-self:flex-end;";
+        txt.textContent=t;
+        oldPreview.appendChild(txt);
+      }
+    }
     removeFile();
     inp.value=""; inp.style.height="auto";
-    // Show image in chat first
-    var div=document.getElementById("chat-messages");
-    var empty=document.getElementById("chat-empty");
-    if(empty)empty.style.display="none";
-    var u=document.createElement("div");
-    u.style.cssText="align-self:flex-end;display:flex;flex-direction:column;gap:6px;max-width:85%;";
-    var imgEl=document.createElement("img");
-    imgEl.src=dataUrl;
-    imgEl.style.cssText="max-width:220px;max-height:220px;border-radius:10px;object-fit:cover;align-self:flex-end;";
-    u.appendChild(imgEl);
-    if(userMsg && userMsg!=="Please analyze this image and help me with it."){
-      var txt=document.createElement("div");
-      txt.className="msg user";
-      txt.style.cssText="margin:0;align-self:flex-end;";
-      txt.textContent=userMsg;
-      u.appendChild(txt);
-    }
-    div.appendChild(u);
-    u.scrollIntoView({behavior:"smooth",block:"start"});
     sendToAIWithImage(userMsg, imgData, imgType);
   } else if(attachedFile && attachedFile.isPDF){
     var userMsg=t||"Please analyze this PDF document and help me with it.";

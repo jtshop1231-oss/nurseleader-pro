@@ -426,9 +426,20 @@ function sendToAIWithImage(userMsg, imageData, imageType){
   isLoading=true;
   var empty=document.getElementById("chat-empty");
   if(empty)empty.style.display="none";
+  // Show image preview + text in chat
   var u=document.createElement("div");
   u.className="msg user";
-  u.textContent=userMsg+" [Image attached]";
+  u.style.cssText="max-width:85%;align-self:flex-end;display:flex;flex-direction:column;gap:6px;";
+  var imgEl=document.createElement("img");
+  imgEl.src="data:"+imageType+";base64,"+imageData;
+  imgEl.style.cssText="max-width:200px;max-height:200px;border-radius:8px;object-fit:cover;";
+  u.appendChild(imgEl);
+  if(userMsg){
+    var txt=document.createElement("div");
+    txt.style.cssText="background:#2B6CB0;color:white;padding:8px 12px;border-radius:8px;font-size:13px;";
+    txt.textContent=userMsg;
+    u.appendChild(txt);
+  }
   div.appendChild(u);
   var loading=document.createElement("div");
   loading.className="msg loading";

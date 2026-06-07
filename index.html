@@ -488,6 +488,7 @@ function sendToAIWithImage(userMsg, imageData, imageType){
     a.className="msg ai";
     a.appendChild(renderText(result.data.text));
     div.appendChild(a);
+    a.scrollIntoView({behavior:"smooth",block:"start"});
     msgCount++;
     var remaining=MAX_MSGS-msgCount;
     if(remaining<=5&&remaining>0){
@@ -555,6 +556,7 @@ function sendToAIWithPDF(userMsg, pdfData, fileName){
     a.className="msg ai";
     a.appendChild(renderText(result.data.text));
     div.appendChild(a);
+    a.scrollIntoView({behavior:"smooth",block:"start"});
     msgCount++;
     var remaining=MAX_MSGS-msgCount;
     if(remaining<=5&&remaining>0){
@@ -612,6 +614,7 @@ function sendToAI(userMsg,isSystem){
     a.className="msg ai";
     a.appendChild(renderText(result.data.text));
     div.appendChild(a);
+    a.scrollIntoView({behavior:"smooth",block:"start"});
     msgCount++;
     var remaining=MAX_MSGS-msgCount;
     if(remaining<=5&&remaining>0){

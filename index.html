@@ -504,7 +504,7 @@ function sendToAIWithImage(userMsg, imageData, imageType){
       var allMsgs = div.querySelectorAll(".msg.user");
       var lastUserMsg = allMsgs[allMsgs.length - 1];
       if(lastUserMsg){
-        lastUserMsg.scrollIntoView({behavior:"smooth", block:"center"});
+        lastUserMsg.scrollIntoView({behavior:"smooth", block:"end"});
       }
     }, 50);
     msgCount++;
@@ -579,7 +579,7 @@ function sendToAIWithPDF(userMsg, pdfData, fileName){
       var allMsgs = div.querySelectorAll(".msg.user");
       var lastUserMsg = allMsgs[allMsgs.length - 1];
       if(lastUserMsg){
-        lastUserMsg.scrollIntoView({behavior:"smooth", block:"center"});
+        lastUserMsg.scrollIntoView({behavior:"smooth", block:"end"});
       }
     }, 50);
     msgCount++;
@@ -643,7 +643,7 @@ function sendToAI(userMsg,isSystem){
       var allMsgs = div.querySelectorAll(".msg.user");
       var lastUserMsg = allMsgs[allMsgs.length - 1];
       if(lastUserMsg){
-        lastUserMsg.scrollIntoView({behavior:"smooth", block:"center"});
+        lastUserMsg.scrollIntoView({behavior:"smooth", block:"end"});
       }
     }, 50);
     msgCount++;

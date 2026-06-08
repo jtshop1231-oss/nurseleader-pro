@@ -133,7 +133,7 @@
       <div class="greeting"><div><h2 id="greet-text"></h2><p id="greet-unit"></p></div><span style="font-size:36px;opacity:0.3">&#127973;</span></div>
       <div class="chat-card">
         <div class="chat-header"><div class="chat-dot"></div><div><div style="font-weight:800;font-size:14px;color:#1A202C">AI Assistant</div><div style="font-size:11px;color:#276749;font-weight:700">&#9679; Online</div></div></div>
-        <div class="chat-messages" id="chat-messages"><div class="chat-empty" id="chat-empty"><span style="font-size:32px;opacity:0.4">&#128172;</span><p style="font-size:13px;color:#2D3748;font-weight:600">How can I help you today?</p><small style="font-size:11px;color:#4A5568;font-weight:500">Click any quick action below or type your message</small></div></div>
+        <div class="chat-messages" id="chat-messages"><div class="chat-empty" id="chat-empty"><span style="font-size:48px;opacity:0.5">&#128172;</span><p style="font-size:18px;color:#2D3748;font-weight:700">How can I help you today?</p><small style="font-size:14px;color:#4A5568;font-weight:500">Click any quick action below or type your message</small></div></div>
         <div id="file-preview-bar" class="file-preview"><span id="file-name-display"></span><span class="remove-file" onclick="removeFile()">&#10006;</span></div>
         <div class="chat-input-area">
           <button class="upload-btn" onclick="document.getElementById('file-input').click()" title="Attach file">+</button>
@@ -677,7 +677,7 @@ function sendToAI(userMsg,isSystem){
 
 function clearChat(){
   chatHistory=[]; msgCount=0;
-  document.getElementById("chat-messages").innerHTML='<div class="chat-empty" id="chat-empty"><span style="font-size:32px;opacity:0.4">&#128172;</span><p style="font-size:13px;color:#2D3748;font-weight:600">How can I help you today?</p><small style="font-size:11px;color:#4A5568;font-weight:500">Click any quick action below or type your message</small></div>';
+  document.getElementById("chat-messages").innerHTML='<div class="chat-empty" id="chat-empty"><span style="font-size:48px;opacity:0.5">&#128172;</span><p style="font-size:18px;color:#2D3748;font-weight:700">How can I help you today?</p><small style="font-size:14px;color:#4A5568;font-weight:500">Click any quick action below or type your message</small></div>';
 }
 
 </script>

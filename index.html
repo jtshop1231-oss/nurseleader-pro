@@ -77,7 +77,8 @@
   .avatar { width: 32px; height: 32px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 12px; }
   .logout-btn { padding: 5px 10px; background: var(--gray-100); border: none; border-radius: 6px; font-size: 11px; color: var(--gray-600); cursor: pointer; font-family: 'DM Sans', sans-serif; }
 
-  .main { max-width: 900px; margin: 20px auto; padding: 24px; display: grid; grid-template-columns: 1fr 300px; gap: 16px; background: #F0F7FF; border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.30); }
+  .main { max-width: 1100px; margin: 20px auto; padding: 24px; background: #F0F7FF; border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.30); }
+  .main-grid { display: grid; grid-template-columns: 1fr 300px; gap: 16px; }
 
   .greeting { background: linear-gradient(135deg, #2B6CB0, #4299E1); border-radius: var(--radius); padding: 16px 20px; color: white; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; grid-column: 1 / -1; }
   .greeting h2 { font-family: 'DM Serif Display', serif; font-size: 20px; margin-bottom: 2px; }
@@ -249,63 +250,65 @@
   </header>
 
   <div class="main">
-    <div>
-      <div class="greeting">
-        <div>
-          <h2 id="greet-text"></h2>
-          <p id="greet-unit"></p>
-        </div>
-        <span style="font-size:36px;opacity:0.3">🏥</span>
-      </div>
-
-      <div class="chat-card">
-        <div class="chat-header">
-          <div class="chat-dot"></div>
+    <div class="main-grid">
+      <div class="left-col">
+        <div class="greeting">
           <div>
-            <div style="font-weight:700;font-size:14px">AI Assistant</div>
-            <div style="font-size:11px;color:#38A169">● Online</div>
+            <h2 id="greet-text"></h2>
+            <p id="greet-unit"></p>
+          </div>
+          <span style="font-size:36px;opacity:0.3">🏥</span>
+        </div>
+
+        <div class="chat-card">
+          <div class="chat-header">
+            <div class="chat-dot"></div>
+            <div>
+              <div style="font-weight:700;font-size:14px">AI Assistant</div>
+              <div style="font-size:11px;color:#38A169">● Online</div>
+            </div>
+          </div>
+          <div class="chat-messages" id="chat-messages">
+            <div class="chat-empty" id="chat-empty">
+              <span style="font-size:32px;opacity:0.4">💬</span>
+              <p style="font-size:13px">How can I help you today?</p>
+              <small style="font-size:11px">Click any quick action below or type your message</small>
+            </div>
+          </div>
+          <div class="chat-input-area">
+            <textarea class="chat-input" id="chat-input" placeholder="Type your message..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+            <button class="clear-btn" onclick="clearChat()">Clear</button>
+            <button class="send-btn" id="send-btn" onclick="sendMessage()">➤</button>
           </div>
         </div>
-        <div class="chat-messages" id="chat-messages">
-          <div class="chat-empty" id="chat-empty">
-            <span style="font-size:32px;opacity:0.4">💬</span>
-            <p style="font-size:13px">How can I help you today?</p>
-            <small style="font-size:11px">Click any quick action below or type your message</small>
-          </div>
-        </div>
-        <div class="chat-input-area">
-          <textarea class="chat-input" id="chat-input" placeholder="Type your message..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
-          <button class="clear-btn" onclick="clearChat()">Clear</button>
-          <button class="send-btn" id="send-btn" onclick="sendMessage()">➤</button>
+
+        <div class="section-title">Quick Actions</div>
+        <div class="quick-grid">
+          <button class="action-btn" onclick="quickAction('incident')"><span class="action-icon">📋</span><span class="action-label">Write Incident Report</span></button>
+          <button class="action-btn" onclick="quickAction('coverage')"><span class="action-icon">👥</span><span class="action-label">Find Staff Coverage</span></button>
+          <button class="action-btn" onclick="quickAction('director')"><span class="action-icon">📊</span><span class="action-label">Prepare Director Report</span></button>
+          <button class="action-btn" onclick="quickAction('patient')"><span class="action-icon">💬</span><span class="action-label">Draft Patient Response</span></button>
+          <button class="action-btn" onclick="quickAction('email')"><span class="action-icon">📧</span><span class="action-label">Draft Staff Email</span></button>
+          <button class="action-btn" onclick="quickAction('vrs')"><span class="action-icon">🎙️</span><span class="action-label">Log VRS Report</span></button>
         </div>
       </div>
 
-      <div class="section-title">Quick Actions</div>
-      <div class="quick-grid">
-        <button class="action-btn" onclick="quickAction('incident')"><span class="action-icon">📋</span><span class="action-label">Write Incident Report</span></button>
-        <button class="action-btn" onclick="quickAction('coverage')"><span class="action-icon">👥</span><span class="action-label">Find Staff Coverage</span></button>
-        <button class="action-btn" onclick="quickAction('director')"><span class="action-icon">📊</span><span class="action-label">Prepare Director Report</span></button>
-        <button class="action-btn" onclick="quickAction('patient')"><span class="action-icon">💬</span><span class="action-label">Draft Patient Response</span></button>
-        <button class="action-btn" onclick="quickAction('email')"><span class="action-icon">📧</span><span class="action-label">Draft Staff Email</span></button>
-        <button class="action-btn" onclick="quickAction('vrs')"><span class="action-icon">🎙️</span><span class="action-label">Log VRS Report</span></button>
-      </div>
-    </div>
-
-    <div>
-      <div class="cert-card">
-        <div class="cert-header">
-          <div style="display:flex;align-items:center;gap:6px">
-            <span>🔔</span>
-            <span class="section-title" style="margin:0">Certification Alerts</span>
+      <div class="right-col">
+        <div class="cert-card">
+          <div class="cert-header">
+            <div style="display:flex;align-items:center;gap:6px">
+              <span>🔔</span>
+              <span class="section-title" style="margin:0">Certification Alerts</span>
+            </div>
+            <span class="cert-badge">3</span>
           </div>
-          <span class="cert-badge">3</span>
+          <div class="cert-list">
+            <div class="cert-item warning"><div class="cert-name">Sarah Johnson, RN</div><div class="cert-type">BLS Certification</div><span class="cert-days warning">14 days remaining</span></div>
+            <div class="cert-item urgent"><div class="cert-name">Michael Chen, LPN</div><div class="cert-type">ACLS Certification</div><span class="cert-days urgent">7 days remaining</span></div>
+            <div class="cert-item normal"><div class="cert-name">Emily Rodriguez, RN</div><div class="cert-type">PALS Certification</div><span class="cert-days normal">21 days remaining</span></div>
+          </div>
+          <div class="view-all">View All Certifications →</div>
         </div>
-        <div class="cert-list">
-          <div class="cert-item warning"><div class="cert-name">Sarah Johnson, RN</div><div class="cert-type">BLS Certification</div><span class="cert-days warning">14 days remaining</span></div>
-          <div class="cert-item urgent"><div class="cert-name">Michael Chen, LPN</div><div class="cert-type">ACLS Certification</div><span class="cert-days urgent">7 days remaining</span></div>
-          <div class="cert-item normal"><div class="cert-name">Emily Rodriguez, RN</div><div class="cert-type">PALS Certification</div><span class="cert-days normal">21 days remaining</span></div>
-        </div>
-        <div class="view-all">View All Certifications →</div>
       </div>
     </div>
   </div>

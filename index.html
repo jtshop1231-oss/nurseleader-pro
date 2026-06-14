@@ -6,437 +6,665 @@
 <title>NurseLeader Pro</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --primary: #2B6CB0;
-    --primary-light: #4299E1;
-    --primary-pale: #EBF8FF;
-    --primary-bg: #EBF8FF;
-    --white: #FFFFFF;
-    --gray-50: #F7FAFC;
-    --gray-100: #EDF2F7;
-    --gray-200: #E2E8F0;
-    --gray-400: #A0AEC0;
-    --gray-600: #718096;
-    --gray-800: #2D3748;
-    --red: #E53E3E;
-    --orange: #DD6B20;
-    --green: #38A169;
-    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
-    --shadow-md: 0 4px 16px rgba(43,108,176,0.10);
-    --radius: 14px;
-    --radius-sm: 8px;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { height: 100%; width: 100%; font-family: 'DM Sans', sans-serif; background: var(--primary-bg); color: var(--gray-800); overflow: hidden; }
+  :root{--primary:#2B6CB0;--primary-light:#4299E1;--primary-pale:#EBF8FF;--primary-bg:#111111;--white:#FFFFFF;--gray-100:#EDF2F7;--gray-200:#E2E8F0;--gray-400:#A0AEC0;--gray-600:#718096;--gray-800:#2D3748;--red:#E53E3E;--orange:#DD6B20;--green:#38A169;--shadow-sm:0 1px 3px rgba(0,0,0,0.08);--shadow-md:0 4px 16px rgba(43,108,176,0.10);--radius:14px;--radius-sm:8px;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{width:100%;font-family:"DM Sans",sans-serif;background:#4A5568;color:var(--gray-800);}
+  #login-screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#2B6CB0,#2C5282,#1A365D);overflow:hidden;}
+  .login-card{background:var(--white);border-radius:20px;padding:24px 24px 28px;width:calc(100% - 32px);max-width:400px;box-shadow:0 8px 32px rgba(43,108,176,0.20);text-align:center;max-height:calc(100vh - 40px);overflow-y:auto;border:2px solid #90CDF4;}
+  .login-logo{width:80px;height:80px;margin:0 auto 10px;display:block;object-fit:contain;}
+  .login-title{font-family:"DM Serif Display",serif;font-size:24px;color:#1A4A7A;margin-bottom:2px;font-weight:700;}
+  .login-sub{font-size:13px;color:#2D3748;margin-bottom:20px;font-weight:600;}
+  .field{margin-bottom:12px;text-align:left;}
+  .field label{display:block;font-size:12px;font-weight:900;color:#1A202C;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.8px;}
+  .field input,.field select{width:100%;padding:11px 14px;border:3px solid #2D3748;border-radius:var(--radius-sm);font-family:"DM Sans",sans-serif;font-size:14px;font-weight:400;color:#1A202C;outline:none;transition:border-color 0.2s;background:white;}
+  .field input:focus,.field select:focus{border-color:#1A4A7A;}
+  .field input::placeholder{color:#718096;}
+  .field select.placeholder{color:#718096;}
+  .field-error{font-size:11px;color:var(--red);margin-top:4px;display:none;font-weight:600;}
+  .field input.error-border,.field select.error-border{border-color:var(--red);}
+  .pw-wrap{position:relative;}
+  .show-pw-btn{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:12px;color:#4A5568;font-family:"DM Sans",sans-serif;font-weight:600;}
+  .login-btn{width:100%;padding:13px;background:var(--primary);color:white;border:none;border-radius:var(--radius-sm);font-family:"DM Sans",sans-serif;font-size:15px;font-weight:700;cursor:pointer;margin-top:8px;transition:background 0.2s;}
+  .login-btn:disabled{background:#A0AEC0;cursor:not-allowed;}
+  #app-screen{display:none;}
+  .header{background:var(--white);border-bottom:1px solid var(--gray-100);padding:0 16px;height:56px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow-sm);position:sticky;top:0;z-index:100;}
+  .header-left{display:flex;align-items:center;gap:8px;}
+  .brand-name{font-family:"DM Serif Display",serif;font-size:16px;color:#1A4A7A;font-weight:700;}
+  .brand-sub{font-size:9px;color:#4A5568;font-weight:600;}
+  .header-right{display:flex;align-items:center;gap:8px;}
+  .avatar{width:32px;height:32px;background:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:12px;}
+  .logout-btn{padding:5px 10px;background:#EDF2F7;border:2px solid #4A5568;border-radius:6px;font-size:11px;font-weight:700;color:#2D3748;cursor:pointer;font-family:"DM Sans",sans-serif;}
+  .main{max-width:1200px;margin:20px auto;padding:24px 32px;background:#EBF8FF;border-radius:20px;box-shadow:0 8px 32px rgba(0,0,0,0.30);}
+  .greeting{background:linear-gradient(135deg,#2B6CB0,#4299E1);border-radius:var(--radius);padding:16px 20px;color:white;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;}
+  .greeting h2{font-family:"DM Serif Display",serif;font-size:20px;margin-bottom:2px;}
+  .greeting p{font-size:13px;font-weight:600;}
+  .chat-card{background:#FFFFFF !important;border-radius:var(--radius);box-shadow:var(--shadow-md);margin-bottom:14px;}
+  .chat-header{padding:12px 16px;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;gap:8px;background:#FFFFFF !important;}
+  .chat-dot{width:8px;height:8px;background:var(--green);border-radius:50%;animation:pulse 2s infinite;}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+  .chat-messages{min-height:200px;padding:14px;display:flex;flex-direction:column;gap:10px;background:#EDF2F7 !important;}
+  .chat-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#4A5568;text-align:center;gap:6px;}
+  .msg{max-width:85%;padding:10px 13px;border-radius:12px;font-size:13px;line-height:1.6;animation:fadeIn 0.3s ease;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  .msg.ai{background:var(--white);border:1px solid var(--gray-200);align-self:flex-start;box-shadow:var(--shadow-sm);}
+  .msg.ai p{margin:4px 0;line-height:1.6;}
+  .msg.ai h1,.msg.ai h2,.msg.ai h3{color:#1A4A7A;font-family:"DM Serif Display",serif;margin:8px 0 4px;}
+  .msg.ai h1{font-size:15px;}.msg.ai h2{font-size:14px;}.msg.ai h3{font-size:13px;}
+  .msg.ai strong{color:#1A202C;font-weight:700;}
+  .msg.ai ul{margin:4px 0 4px 16px;line-height:1.8;}
+  .msg.ai li{margin:2px 0;}
+  .msg.ai table{border-collapse:collapse;width:100%;margin:8px 0;font-size:12px;}
+  .msg.ai th{background:#2B6CB0;color:white;padding:6px 8px;text-align:left;font-weight:700;}
+  .msg.ai td{padding:5px 8px;border:1px solid #E2E8F0;}
+  .msg.ai tr:nth-child(even) td{background:#F7FAFC;}
+  .msg.ai hr{border:none;border-top:1px solid #E2E8F0;margin:8px 0;}
+  .msg.user{background:var(--primary);color:white;align-self:flex-end;}
+  .msg.loading{background:var(--white);border:1px solid var(--gray-200);align-self:flex-start;padding:12px 16px;}
+  .msg.error{background:#FFF5F5;border:1px solid #FC8181;color:var(--red);align-self:flex-start;font-size:12px;}
+  .dots{display:flex;gap:4px;}
+  .dots span{width:6px;height:6px;background:var(--primary-light);border-radius:50%;animation:bounce 1.2s infinite;}
+  .dots span:nth-child(2){animation-delay:0.2s}.dots span:nth-child(3){animation-delay:0.4s}
+  @keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+  .chat-input-area{padding:10px 14px;border-top:1px solid var(--gray-100);display:flex;gap:8px;align-items:center;background:#FFFFFF !important;position:sticky;bottom:0;z-index:50;}
+  .upload-btn{padding:8px 12px;background:#EDF2F7;color:#2B6CB0;border:2px solid #4A5568;border-radius:8px;cursor:pointer;font-size:20px;font-weight:700;line-height:1;flex-shrink:0;}
 
-  /* LOGIN */
-  #login-screen {
-    position: fixed;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, #EBF8FF, #BEE3F8, #90CDF4);
-    overflow: hidden;
-  }
-  .login-card {
-    background: var(--white);
-    border-radius: 20px;
-    padding: 20px 22px 24px;
-    width: calc(100% - 32px);
-    max-width: 400px;
-    box-shadow: 0 8px 32px rgba(43,108,176,0.15);
-    text-align: center;
-    max-height: calc(100vh - 40px);
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  .login-logo { width: 70px; height: 70px; margin: 0 auto 8px; display: block; }
-  .login-title { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--primary); margin-bottom: 2px; }
-  .login-sub { font-size: 12px; color: var(--gray-600); margin-bottom: 16px; }
-  .field { margin-bottom: 10px; text-align: left; }
-  .field label { display: block; font-size: 10px; font-weight: 700; color: var(--gray-600); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
-  .field input, .field select { width: 100%; padding: 10px 12px; border: 2px solid var(--gray-200); border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none; transition: border-color 0.2s; }
-  .field input:focus, .field select:focus { border-color: var(--primary-light); }
-  .api-note { font-size: 10px; color: var(--gray-400); margin-top: 4px; }
-  .show-btn { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 12px; color: var(--gray-600); font-family: 'DM Sans', sans-serif; }
-  .pw-wrap { position: relative; }
-  .login-btn { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 8px; transition: background 0.2s; }
-  .login-btn:hover { background: var(--primary-light); }
-  .login-btn:disabled { background: var(--gray-400); cursor: not-allowed; }
-
-  /* APP SCREEN */
-  #app-screen { display: none; height: 100vh; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-
-  /* HEADER */
-  .header { background: var(--white); border-bottom: 1px solid var(--gray-100); padding: 0 16px; height: 56px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow-sm); position: sticky; top: 0; z-index: 100; }
-  .header-left { display: flex; align-items: center; gap: 8px; }
-  .brand-name { font-family: 'DM Serif Display', serif; font-size: 16px; color: var(--primary); }
-  .brand-sub { font-size: 9px; color: var(--gray-400); }
-  .header-right { display: flex; align-items: center; gap: 8px; }
-  .avatar { width: 32px; height: 32px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 12px; }
-  .logout-btn { padding: 5px 10px; background: var(--gray-100); border: none; border-radius: 6px; font-size: 11px; color: var(--gray-600); cursor: pointer; font-family: 'DM Sans', sans-serif; }
-
-  .main { max-width: 1100px; margin: 20px auto; padding: 24px; background: #EBF8FF; border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.30); }
-  .main-grid { display: grid; grid-template-columns: 1fr 300px; gap: 16px; }
-
-  .greeting { background: linear-gradient(135deg, #2B6CB0, #4299E1); border-radius: var(--radius); padding: 16px 20px; color: white; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; grid-column: 1 / -1; }
-  .greeting h2 { font-family: 'DM Serif Display', serif; font-size: 20px; margin-bottom: 2px; }
-  .greeting p { font-size: 12px; opacity: 0.85; }
-
-  .chat-card { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow-md); overflow: hidden; margin-bottom: 14px; border: 2px solid #1A202C; }
-  .chat-header { padding: 12px 16px; border-bottom: 1px solid var(--gray-100); display: flex; align-items: center; gap: 8px; }
-  .chat-dot { width: 8px; height: 8px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-  .chat-messages { height: 260px; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; background: var(--gray-50); }
-  .chat-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--gray-400); text-align: center; gap: 6px; }
-  .msg { max-width: 85%; padding: 10px 13px; border-radius: 12px; font-size: 13px; line-height: 1.6; animation: fadeIn 0.3s ease; }
-  @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
-  .msg.ai { background: var(--white); border: 1px solid var(--gray-200); align-self: flex-start; white-space: pre-wrap; box-shadow: var(--shadow-sm); }
-  .msg.user { background: var(--primary); color: white; align-self: flex-end; }
-  .msg.loading { background: var(--white); border: 1px solid var(--gray-200); align-self: flex-start; padding: 12px 16px; }
-  .msg.error { background: #FFF5F5; border: 1px solid #FC8181; color: var(--red); align-self: flex-start; font-size: 12px; }
-  .dots { display: flex; gap: 4px; }
-  .dots span { width: 6px; height: 6px; background: var(--primary-light); border-radius: 50%; animation: bounce 1.2s infinite; }
-  .dots span:nth-child(2){animation-delay:0.2s} .dots span:nth-child(3){animation-delay:0.4s}
-  @keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
-  .chat-input-area { padding: 10px 14px; border-top: 1px solid var(--gray-100); display: flex; gap: 8px; background: var(--white); }
-  .chat-input { flex: 1; padding: 9px 12px; border: 2px solid var(--gray-200); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 13px; outline: none; resize: none; }
-  .chat-input:focus { border-color: var(--primary-light); }
-  .send-btn { padding: 9px 14px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; }
-  .send-btn:disabled { background: var(--gray-200); cursor: not-allowed; }
-  .clear-btn { padding: 9px 10px; background: var(--gray-100); color: var(--gray-600); border: none; border-radius: 8px; cursor: pointer; font-size: 12px; font-family: 'DM Sans', sans-serif; }
-
-  .section-title { font-size: 11px; font-weight: 700; color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
-  .quick-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
-  .action-btn { background: var(--white); border: 2px solid var(--gray-100); border-radius: var(--radius-sm); padding: 10px 8px; cursor: pointer; text-align: left; font-family: 'DM Sans', sans-serif; display: flex; flex-direction: column; gap: 4px; box-shadow: var(--shadow-sm); transition: all 0.2s; }
-  .action-btn:hover { border-color: var(--primary-light); background: var(--primary-pale); transform: translateY(-2px); }
-  .action-icon { font-size: 18px; }
-  .action-label { font-size: 11px; font-weight: 700; color: var(--gray-800); line-height: 1.3; }
-
-  .cert-card { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow-md); overflow: hidden; border: 2px solid #1A202C; }
-  .cert-header { padding: 12px 16px; border-bottom: 1px solid var(--gray-100); display: flex; align-items: center; justify-content: space-between; }
-  .cert-badge { background: var(--red); color: white; border-radius: 10px; padding: 2px 8px; font-size: 11px; font-weight: 700; }
-  .cert-list { padding: 8px; display: flex; flex-direction: column; gap: 6px; }
-  .cert-item { padding: 10px 12px; border-radius: var(--radius-sm); border-left: 4px solid; }
-  .cert-item.urgent { border-color: var(--red); background: #FFF5F5; }
-  .cert-item.warning { border-color: var(--orange); background: #FFFAF0; }
-  .cert-item.normal { border-color: var(--primary-light); background: var(--primary-pale); }
-  .cert-name { font-size: 12px; font-weight: 700; }
-  .cert-type { font-size: 11px; color: var(--gray-600); margin-top: 1px; }
-  .cert-days { display: inline-block; margin-top: 4px; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 8px; color: white; }
-  .cert-days.urgent { background: var(--red); }
-  .cert-days.warning { background: var(--orange); }
-  .cert-days.normal { background: var(--primary-light); }
-  .view-all { display: block; text-align: center; padding: 10px; font-size: 12px; color: var(--primary); font-weight: 700; cursor: pointer; border-top: 1px solid var(--gray-100); }
-
-  @media (max-width: 768px) {
-    .main { grid-template-columns: 1fr; padding: 12px; }
-    .quick-grid { grid-template-columns: repeat(2,1fr); }
-    .header-date { display: none; }
-  }
+  .chat-input{flex:1;padding:9px 12px;border:2px solid #718096;border-radius:8px;font-family:"DM Sans",sans-serif;font-size:13px;outline:none;resize:none;color:#1A202C;}
+  .chat-input::placeholder{color:#4A5568;}
+  .chat-input:focus{border-color:var(--primary-light);}
+  .send-btn{padding:9px 14px;background:var(--primary);color:white;border:none;border-radius:8px;cursor:pointer;font-size:16px;flex-shrink:0;}
+  .send-btn:disabled{background:var(--gray-200);cursor:not-allowed;}
+  .clear-btn{padding:9px 10px;background:#EDF2F7;color:#2D3748;border:2px solid #4A5568;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;font-family:"DM Sans",sans-serif;flex-shrink:0;}
+  .file-preview{background:#EBF8FF;border:1px solid #90CDF4;border-radius:8px;padding:6px 10px;font-size:11px;color:#2B6CB0;font-weight:600;display:none;align-items:center;gap:6px;margin:0 14px 6px;}
+  .file-preview .remove-file{cursor:pointer;color:#E53E3E;font-weight:700;margin-left:auto;}
+  .section-title{font-size:12px;font-weight:800;color:#1A202C;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;}
+  .quick-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+  .action-btn{background:#FFFFFF !important;border:2px solid #A0AEC0;border-radius:var(--radius-sm);padding:10px 8px;cursor:pointer;text-align:left;font-family:"DM Sans",sans-serif;display:flex;flex-direction:column;gap:4px;box-shadow:var(--shadow-sm);transition:all 0.2s;}
+  .action-btn:hover{border-color:var(--primary-light);background:var(--primary-pale);transform:translateY(-2px);}
+  .action-icon{font-size:18px;}
+  .action-label{font-size:12px;font-weight:800;color:#1A202C;line-height:1.3;}
+  .cert-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow-md);overflow:hidden;}
+  .cert-header{padding:12px 16px;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;justify-content:space-between;}
+  .cert-badge{background:var(--red);color:white;border-radius:10px;padding:2px 8px;font-size:11px;font-weight:700;}
+  .cert-list{padding:8px;display:flex;flex-direction:column;gap:6px;}
+  .cert-item{padding:10px 12px;border-radius:var(--radius-sm);border-left:4px solid;}
+  .cert-item.urgent{border-color:var(--red);background:#FFF5F5;}
+  .cert-item.warning{border-color:var(--orange);background:#FFFAF0;}
+  .cert-item.normal{border-color:var(--primary-light);background:var(--primary-pale);}
+  .cert-name{font-size:13px;font-weight:800;color:#1A202C;}
+  .cert-type{font-size:12px;color:#2D3748;margin-top:1px;font-weight:600;}
+  .cert-days{display:inline-block;margin-top:4px;font-size:10px;font-weight:700;padding:2px 7px;border-radius:8px;color:white;}
+  .cert-days.urgent{background:var(--red);}
+  .cert-days.warning{background:var(--orange);}
+  .cert-days.normal{background:var(--primary-light);}
+  .view-all{display:block;text-align:center;padding:10px;font-size:12px;color:#1A4A7A;font-weight:800;cursor:pointer;border-top:1px solid var(--gray-100);}
+  @media(max-width:768px){.main{padding:12px;}.quick-grid{grid-template-columns:repeat(2,1fr);}.header-date{display:none;}}
 </style>
 </head>
 <body>
-
-<!-- LOGIN -->
 <div id="login-screen">
   <div class="login-card">
-
-    <!-- PROPER CADUCEUS SVG -->
-    <svg class="login-logo" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-      <!-- Main staff -->
-      <rect x="95" y="55" width="10" height="130" rx="5" fill="#2B6CB0"/>
-      <!-- Top ball -->
-      <circle cx="100" cy="50" r="10" fill="#2B6CB0"/>
-
-      <!-- LEFT WING upper -->
-      <path d="M100 70 C85 60 55 50 30 42 C50 48 75 62 100 70Z" fill="#2B6CB0"/>
-      <path d="M100 70 C88 63 65 55 42 50 C62 54 82 64 100 70Z" fill="#4299E1"/>
-      <!-- LEFT WING lower -->
-      <path d="M100 80 C82 72 55 65 32 60 C52 65 78 74 100 80Z" fill="#2B6CB0"/>
-      <path d="M100 80 C86 74 65 68 45 65 C62 68 82 76 100 80Z" fill="#4299E1"/>
-
-      <!-- RIGHT WING upper -->
-      <path d="M100 70 C115 60 145 50 170 42 C150 48 125 62 100 70Z" fill="#2B6CB0"/>
-      <path d="M100 70 C112 63 135 55 158 50 C138 54 118 64 100 70Z" fill="#4299E1"/>
-      <!-- RIGHT WING lower -->
-      <path d="M100 80 C118 72 145 65 168 60 C148 65 122 74 100 80Z" fill="#2B6CB0"/>
-      <path d="M100 80 C114 74 135 68 155 65 C138 68 118 76 100 80Z" fill="#4299E1"/>
-
-      <!-- LEFT SNAKE body -->
-      <path d="M100 90 C80 95 72 105 80 115 C88 125 100 128 100 138 C100 148 88 155 78 158"
-            stroke="#2B6CB0" stroke-width="8" fill="none" stroke-linecap="round"/>
-      <!-- RIGHT SNAKE body -->
-      <path d="M100 90 C120 95 128 105 120 115 C112 125 100 128 100 138 C100 148 112 155 122 158"
-            stroke="#2B6CB0" stroke-width="8" fill="none" stroke-linecap="round"/>
-
-      <!-- LEFT SNAKE head -->
-      <ellipse cx="74" cy="161" rx="8" ry="6" fill="#2B6CB0" transform="rotate(-20 74 161)"/>
-      <!-- RIGHT SNAKE head -->
-      <ellipse cx="126" cy="161" rx="8" ry="6" fill="#2B6CB0" transform="rotate(20 126 161)"/>
-
-      <!-- Bottom tip -->
-      <polygon points="96,185 100,195 104,185" fill="#2B6CB0"/>
-    </svg>
-
+    <svg class="login-logo" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><rect x="95" y="55" width="10" height="130" rx="5" fill="#2B6CB0"/><circle cx="100" cy="50" r="10" fill="#2B6CB0"/><path d="M100 70 C85 60 55 50 30 42 C50 48 75 62 100 70Z" fill="#2B6CB0"/><path d="M100 70 C88 63 65 55 42 50 C62 54 82 64 100 70Z" fill="#4299E1"/><path d="M100 80 C82 72 55 65 32 60 C52 65 78 74 100 80Z" fill="#2B6CB0"/><path d="M100 70 C115 60 145 50 170 42 C150 48 125 62 100 70Z" fill="#2B6CB0"/><path d="M100 80 C118 72 145 65 168 60 C148 65 122 74 100 80Z" fill="#2B6CB0"/><path d="M100 90 C80 95 72 105 80 115 C88 125 100 128 100 138 C100 148 88 155 78 158" stroke="#2B6CB0" stroke-width="8" fill="none" stroke-linecap="round"/><path d="M100 90 C120 95 128 105 120 115 C112 125 100 128 100 138 C100 148 112 155 122 158" stroke="#2B6CB0" stroke-width="8" fill="none" stroke-linecap="round"/><ellipse cx="74" cy="161" rx="8" ry="6" fill="#2B6CB0" transform="rotate(-20 74 161)"/><ellipse cx="126" cy="161" rx="8" ry="6" fill="#2B6CB0" transform="rotate(20 126 161)"/><polygon points="96,185 100,195 104,185" fill="#2B6CB0"/></svg>
     <h1 class="login-title">NurseLeader Pro</h1>
     <p class="login-sub">Hospital Management Dashboard</p>
-
-    <div class="field">
-      <label>Full Name</label>
-      <input type="text" id="inp-name" placeholder="Enter your name" oninput="checkForm()">
-    </div>
-    <div class="field">
-      <label>Unit / Department</label>
-      <input type="text" id="inp-unit" placeholder="e.g. IMU, ICU, Med-Surg" oninput="checkForm()">
-    </div>
-    <div class="field">
-      <label>Role</label>
-      <select id="inp-role">
-        <option>Nursing Manager</option>
-        <option>Nursing Director</option>
-        <option>Charge Nurse</option>
-        <option>Nursing Supervisor</option>
-      </select>
-    </div>
-    <div class="field">
-      <label>🔑 Anthropic API Key</label>
-      <div class="pw-wrap">
-        <input type="password" id="inp-key" placeholder="sk-ant-api03-..." oninput="checkForm()" style="padding-right:60px">
-        <button class="show-btn" onclick="toggleKey()">Show</button>
-      </div>
-      <p class="api-note">🔒 Saved locally on your device only. Never shared.</p>
-    </div>
-
-    <div id="form-warning" style="background:#FFF5F5;border:1px solid #FC8181;border-radius:8px;padding:8px 12px;font-size:12px;color:#E53E3E;margin-bottom:8px;display:none;">
-      ⚠️ Please fill in all fields before signing in.
-    </div>
-
-    <button class="login-btn" id="login-btn" onclick="login()" disabled>Sign In →</button>
+    <div class="field"><label>Full Name</label><input type="text" id="inp-name" placeholder="Enter your full name" oninput="checkForm()" onkeyup="checkForm()" onblur="validateField('inp-name','err-name')" onkeydown="if(event.key==='Enter') doLogin()"><div class="field-error" id="err-name">Please enter your full name.</div></div>
+    <div class="field"><label>Unit / Department</label><input type="text" id="inp-unit" placeholder="e.g. IMU, ICU, Med-Surg" oninput="checkForm()" onkeyup="checkForm()" onblur="validateField('inp-unit','err-unit')" onkeydown="if(event.key==='Enter') doLogin()"><div class="field-error" id="err-unit">Please enter your unit or department.</div></div>
+    <div class="field"><label>Role</label><select id="inp-role" onchange="handleRoleChange()" onkeyup="checkForm()" class="placeholder"><option value="" disabled selected>Please select your role from the dropdown</option><option value="Nursing Manager">Nursing Manager</option><option value="Nursing Director">Nursing Director</option><option value="Charge Nurse">Charge Nurse</option><option value="Nursing Supervisor">Nursing Supervisor</option><option value="Others">Others</option></select><div class="field-error" id="err-role">Please select your role.</div></div>
+    <div class="field" id="other-role-field" style="display:none"><label>Please Specify Your Role</label><input type="text" id="inp-other-role" placeholder="e.g. Staff Nurse, CNA, LPN..." oninput="checkForm()"><div class="field-error" id="err-other-role">Please specify your role.</div></div>
+    <div class="field"><label>&#128274; Access Password</label><div class="pw-wrap"><input type="password" id="inp-password" placeholder="Enter access password" oninput="checkForm()" onkeyup="checkForm()" onkeydown="if(event.key==='Enter') doLogin()" style="padding-right:60px"><button class="show-pw-btn" onclick="togglePw()">Show</button></div><div class="field-error" id="err-password">Please enter the access password.</div></div>
+    <div id="form-warning" style="background:#FFF5F5;border:1px solid #FC8181;border-radius:8px;padding:8px 12px;font-size:12px;color:#E53E3E;margin-bottom:8px;display:none;">Please fill in all required fields.</div>
+    <button class="login-btn" id="login-btn" onclick="doLogin()" disabled>Sign In &rarr;</button>
   </div>
 </div>
-
-<!-- MAIN APP -->
 <div id="app-screen">
   <header class="header">
     <div class="header-left">
-      <svg width="28" height="28" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-        <rect x="95" y="55" width="10" height="130" rx="5" fill="#2B6CB0"/>
-        <circle cx="100" cy="50" r="10" fill="#2B6CB0"/>
-        <path d="M100 70 C85 60 55 50 30 42 C50 48 75 62 100 70Z" fill="#2B6CB0"/>
-        <path d="M100 70 C115 60 145 50 170 42 C150 48 125 62 100 70Z" fill="#2B6CB0"/>
-        <path d="M100 80 C82 72 55 65 32 60 C52 65 78 74 100 80Z" fill="#2B6CB0"/>
-        <path d="M100 80 C118 72 145 65 168 60 C148 65 122 74 100 80Z" fill="#2B6CB0"/>
-        <path d="M100 90 C80 95 72 105 80 115 C88 125 100 128 100 138 C100 148 88 155 78 158" stroke="#2B6CB0" stroke-width="8" fill="none" stroke-linecap="round"/>
-        <path d="M100 90 C120 95 128 105 120 115 C112 125 100 128 100 138 C100 148 112 155 122 158" stroke="#2B6CB0" stroke-width="8" fill="none" stroke-linecap="round"/>
-        <ellipse cx="74" cy="161" rx="8" ry="6" fill="#2B6CB0" transform="rotate(-20 74 161)"/>
-        <ellipse cx="126" cy="161" rx="8" ry="6" fill="#2B6CB0" transform="rotate(20 126 161)"/>
-      </svg>
-      <div>
-        <div class="brand-name">NurseLeader Pro</div>
-        <div class="brand-sub">Hospital Management Dashboard</div>
-      </div>
+      <svg style="width:32px;height:32px;" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><rect x="95" y="55" width="10" height="130" rx="5" fill="#2B6CB0"/><circle cx="100" cy="50" r="10" fill="#2B6CB0"/><path d="M100 70 C85 60 55 50 30 42 C50 48 75 62 100 70Z" fill="#2B6CB0"/><path d="M100 70 C115 60 145 50 170 42 C150 48 125 62 100 70Z" fill="#2B6CB0"/><path d="M100 90 C80 95 72 105 80 115 C88 125 100 128 100 138 C100 148 88 155 78 158" stroke="#2B6CB0" stroke-width="8" fill="none" stroke-linecap="round"/><path d="M100 90 C120 95 128 105 120 115 C112 125 100 128 100 138 C100 148 112 155 122 158" stroke="#2B6CB0" stroke-width="8" fill="none" stroke-linecap="round"/><ellipse cx="74" cy="161" rx="8" ry="6" fill="#2B6CB0" transform="rotate(-20 74 161)"/><ellipse cx="126" cy="161" rx="8" ry="6" fill="#2B6CB0" transform="rotate(20 126 161)"/></svg>
+      <div><div class="brand-name">NurseLeader Pro</div><div class="brand-sub">Hospital Management Dashboard</div></div>
     </div>
     <div class="header-right">
       <div style="font-size:11px;color:#718096;display:none" id="hdr-date" class="header-date"></div>
-      <div style="text-align:right">
-        <div style="font-size:12px;font-weight:600" id="hdr-name"></div>
-        <div style="font-size:10px;color:#A0AEC0" id="hdr-role"></div>
-      </div>
+      <div style="text-align:right"><div style="font-size:12px;font-weight:800;color:#1A202C" id="hdr-name"></div><div style="font-size:10px;color:#4A5568;font-weight:600" id="hdr-role"></div></div>
       <div class="avatar" id="hdr-avatar"></div>
-      <button class="logout-btn" onclick="logout()">Sign Out</button>
+      <button class="logout-btn" onclick="doLogout()">Sign Out</button>
     </div>
   </header>
-
   <div class="main">
-    <div class="main-grid">
-      <div class="left-col">
-        <div class="greeting">
-          <div>
-            <h2 id="greet-text"></h2>
-            <p id="greet-unit"></p>
-          </div>
-          <span style="font-size:36px;opacity:0.3">🏥</span>
-        </div>
-
-        <div class="chat-card">
-          <div class="chat-header">
-            <div class="chat-dot"></div>
-            <div>
-              <div style="font-weight:700;font-size:14px">AI Assistant</div>
-              <div style="font-size:11px;color:#38A169">● Online</div>
-            </div>
-          </div>
-          <div class="chat-messages" id="chat-messages">
-            <div class="chat-empty" id="chat-empty">
-              <span style="font-size:32px;opacity:0.4">💬</span>
-              <p style="font-size:13px">How can I help you today?</p>
-              <small style="font-size:11px">Click any quick action below or type your message</small>
-            </div>
-          </div>
-          <div class="chat-input-area">
-            <textarea class="chat-input" id="chat-input" placeholder="Type your message..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
-            <button class="clear-btn" onclick="clearChat()">Clear</button>
-            <button class="send-btn" id="send-btn" onclick="sendMessage()">➤</button>
-          </div>
-        </div>
-
-        <div class="section-title">Quick Actions</div>
-        <div class="quick-grid">
-          <button class="action-btn" onclick="quickAction('incident')"><span class="action-icon">📋</span><span class="action-label">Write Incident Report</span></button>
-          <button class="action-btn" onclick="quickAction('coverage')"><span class="action-icon">👥</span><span class="action-label">Find Staff Coverage</span></button>
-          <button class="action-btn" onclick="quickAction('director')"><span class="action-icon">📊</span><span class="action-label">Prepare Director Report</span></button>
-          <button class="action-btn" onclick="quickAction('patient')"><span class="action-icon">💬</span><span class="action-label">Draft Patient Response</span></button>
-          <button class="action-btn" onclick="quickAction('email')"><span class="action-icon">📧</span><span class="action-label">Draft Staff Email</span></button>
-          <button class="action-btn" onclick="quickAction('vrs')"><span class="action-icon">🎙️</span><span class="action-label">Log VRS Report</span></button>
+    <div>
+      <div class="greeting"><div><h2 id="greet-text"></h2><p id="greet-unit"></p></div><span style="font-size:36px;opacity:0.3">&#127973;</span></div>
+      <div class="chat-card">
+        <div class="chat-header"><div class="chat-dot"></div><div><div style="font-weight:800;font-size:14px;color:#1A202C">AI Assistant</div><div style="font-size:11px;color:#276749;font-weight:700">&#9679; Online</div></div></div>
+        <div class="chat-messages" id="chat-messages"><div class="chat-empty" id="chat-empty"><span style="font-size:48px;opacity:0.5">&#128172;</span><p style="font-size:18px;color:#2D3748;font-weight:700">How can I help you today?</p><small style="font-size:14px;color:#4A5568;font-weight:500">Click any quick action below or type your message</small></div></div>
+        <div id="file-preview-bar" class="file-preview"><span id="file-name-display"></span><span class="remove-file" onclick="removeFile()">&#10006;</span></div>
+        <div class="chat-input-area">
+          <button class="upload-btn" onclick="document.getElementById('file-input').click()" title="Attach file">+</button>
+          <input type="file" id="file-input" accept="image/*,.pdf,.txt,.doc,.docx" style="display:none" onchange="handleFileUpload(event)">
+          <textarea class="chat-input" id="chat-input" placeholder="Type your message..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+          <button class="clear-btn" onclick="clearChat()">Clear</button>
+          <button class="send-btn" id="send-btn" onclick="sendMessage()">&#10148;</button>
         </div>
       </div>
-
-      <div class="right-col">
-        <div class="cert-card">
-          <div class="cert-header">
-            <div style="display:flex;align-items:center;gap:6px">
-              <span>🔔</span>
-              <span class="section-title" style="margin:0">Certification Alerts</span>
-            </div>
-            <span class="cert-badge">3</span>
-          </div>
-          <div class="cert-list">
-            <div class="cert-item warning"><div class="cert-name">Sarah Johnson, RN</div><div class="cert-type">BLS Certification</div><span class="cert-days warning">14 days remaining</span></div>
-            <div class="cert-item urgent"><div class="cert-name">Michael Chen, LPN</div><div class="cert-type">ACLS Certification</div><span class="cert-days urgent">7 days remaining</span></div>
-            <div class="cert-item normal"><div class="cert-name">Emily Rodriguez, RN</div><div class="cert-type">PALS Certification</div><span class="cert-days normal">21 days remaining</span></div>
-          </div>
-          <div class="view-all">View All Certifications →</div>
-        </div>
+      <div class="section-title">Quick Actions</div>
+      <div class="quick-grid">
+        <button class="action-btn" onclick="quickAction('incident')"><span class="action-icon">&#128203;</span><span class="action-label">Write Incident Report</span></button>
+        <button class="action-btn" onclick="quickAction('coverage')"><span class="action-icon">&#128101;</span><span class="action-label">Find Staff Coverage</span></button>
+        <button class="action-btn" onclick="quickAction('director')"><span class="action-icon">&#128202;</span><span class="action-label">Prepare Director Report</span></button>
+        <button class="action-btn" onclick="quickAction('patient')"><span class="action-icon">&#128172;</span><span class="action-label">Draft Patient Response</span></button>
+        <button class="action-btn" onclick="quickAction('email')"><span class="action-icon">&#128231;</span><span class="action-label">Draft Staff Email</span></button>
+        <button class="action-btn" onclick="quickAction('vrs')"><span class="action-icon">&#127897;</span><span class="action-label">Log VRS Report</span></button>
       </div>
     </div>
+
   </div>
 </div>
-
 <script>
-  let currentUser = null;
-  let history = [];
-  let isLoading = false;
 
-  const prompts = {
-    incident: "I need to write a professional hospital incident report. Please ask me for the necessary details step by step — date, time, location, patient information, what happened, and any witnesses. Then generate a complete professional incident report.",
-    coverage: "I need help finding staff coverage for an open shift. Please ask me for the shift details (date, time, unit) and help me draft a professional message to send to available per-diem or overtime staff.",
-    director: "I need to prepare a report for my director. Please ask me what type of report and the key details, then generate a professional well-formatted report.",
-    patient: "I need to draft a professional response to a patient complaint. Please ask me for the details and help me write a compassionate professional response letter.",
-    email: "I need to draft a professional staff email. Please ask me what the email is about and who it is for, then help me write a clear professional communication.",
-    vrs: "I need to log a verbal report (VRS) from my staff. Please ask me for the patient name or room, the reporting staff member, and the key information shared, then help me create proper documentation."
-  };
+var currentUser=null,chatHistory=[],isLoading=false,msgCount=0,attachedFile=null;
+var MAX_MSGS=20;
 
-  window.onload = () => {
-    const saved = localStorage.getItem('nlp_key');
-    if (saved) {
-      document.getElementById('inp-key').value = saved;
-      checkForm();
+var prompts={
+  incident:"I need to write a professional hospital incident report. Please ask me for the necessary details step by step - date, time, location, patient information, what happened, and any witnesses. Then generate a complete professional incident report.",
+  coverage:"I need help finding staff coverage for an open shift. Please ask me for the shift details (date, time, unit) and help me draft a professional message to send to available per-diem or overtime staff.",
+  director:"I need to prepare a report for my director. Please ask me what type of report and the key details, then generate a professional well-formatted report.",
+  patient:"I need to draft a professional response to a patient complaint. Please ask me for the details and help me write a compassionate professional response letter.",
+  email:"I need to draft a professional staff email. Please ask me what the email is about and who it is for, then help me write a clear professional communication.",
+  vrs:"I need to log a verbal report (VRS) from my staff. Please ask me for the patient name or room, the reporting staff member, and the key information shared, then help me create proper documentation."
+};
+
+window.onload=function(){ checkForm(); };
+
+function handleRoleChange(){
+  var sel=document.getElementById("inp-role");
+  sel.classList.remove("placeholder");
+  document.getElementById("err-role").style.display="none";
+  sel.classList.remove("error-border");
+  if(sel.value==="Others"){
+    document.getElementById("other-role-field").style.display="block";
+  } else {
+    document.getElementById("other-role-field").style.display="none";
+    document.getElementById("inp-other-role").value="";
+  }
+  checkForm();
+}
+
+function validateField(inputId,errorId){
+  var val=document.getElementById(inputId).value.trim();
+  document.getElementById(errorId).style.display=val?"none":"block";
+  if(val){ document.getElementById(inputId).classList.remove("error-border"); }
+  else { document.getElementById(inputId).classList.add("error-border"); }
+}
+
+function checkForm(){
+  var n=document.getElementById("inp-name").value.trim();
+  var u=document.getElementById("inp-unit").value.trim();
+  var r=document.getElementById("inp-role").value;
+  var p=document.getElementById("inp-password").value.trim();
+  var isOthers=(r==="Others");
+  var other=isOthers?document.getElementById("inp-other-role").value.trim():"x";
+  var ok=(n&&u&&r&&p&&other)?true:false;
+  document.getElementById("login-btn").disabled=!ok;
+  document.getElementById("login-btn").style.background=ok?"#2B6CB0":"#A0AEC0";
+}
+
+function togglePw(){
+  var inp=document.getElementById("inp-password");
+  var btn=document.querySelector(".show-pw-btn");
+  if(inp.type==="password"){ inp.type="text"; btn.textContent="Hide"; }
+  else { inp.type="password"; btn.textContent="Show"; }
+}
+
+function doLogin(){
+  var n=document.getElementById("inp-name").value.trim();
+  var u=document.getElementById("inp-unit").value.trim();
+  var r=document.getElementById("inp-role").value;
+  var p=document.getElementById("inp-password").value.trim();
+  var isOthers=(r==="Others");
+  var other=isOthers?document.getElementById("inp-other-role").value.trim():"";
+  var finalRole=isOthers?other:r;
+  var hasError=false;
+  if(!n){document.getElementById("err-name").style.display="block";document.getElementById("inp-name").classList.add("error-border");hasError=true;}
+  if(!u){document.getElementById("err-unit").style.display="block";document.getElementById("inp-unit").classList.add("error-border");hasError=true;}
+  if(!r){document.getElementById("err-role").style.display="block";document.getElementById("inp-role").classList.add("error-border");hasError=true;}
+  if(isOthers&&!other){document.getElementById("err-other-role").style.display="block";document.getElementById("inp-other-role").classList.add("error-border");hasError=true;}
+  if(!p){document.getElementById("err-password").style.display="block";document.getElementById("inp-password").classList.add("error-border");hasError=true;}
+  if(hasError){document.getElementById("form-warning").style.display="block";return;}
+  var btn=document.getElementById("login-btn");
+  btn.disabled=true;btn.style.background="#4299E1";btn.textContent="Verifying...";
+  fetch("/api/chat",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({messages:[{role:"user",content:"ping"}],systemPrompt:"Reply OK",password:p})
+  }).then(function(res){
+    return res.json().then(function(data){ return {status:res.status,data:data}; });
+  }).then(function(result){
+    if(result.status===401){
+      document.getElementById("err-password").textContent="Incorrect password. Please try again.";
+      document.getElementById("err-password").style.display="block";
+      document.getElementById("inp-password").value="";
+      btn.disabled=false;btn.style.background="#A0AEC0";btn.textContent="Sign In \u2192";
+      return;
+    }
+    currentUser={name:n,unit:u,role:finalRole,password:p};
+    var h=new Date().getHours();
+    var g=h<12?"Good Morning":h<17?"Good Afternoon":"Good Evening";
+    document.getElementById("greet-text").textContent=g+", "+n+"!";
+    document.getElementById("greet-unit").textContent=finalRole+" - "+u;
+    document.getElementById("hdr-name").textContent=n;
+    document.getElementById("hdr-role").textContent=finalRole;
+    document.getElementById("hdr-avatar").textContent=n.charAt(0).toUpperCase();
+    document.getElementById("login-screen").style.display="none";
+    document.getElementById("app-screen").style.display="block";
+  }).catch(function(){
+    document.getElementById("err-password").textContent="Cannot connect to server. Check your internet.";
+    document.getElementById("err-password").style.display="block";
+    btn.disabled=false;btn.style.background="#A0AEC0";btn.textContent="Sign In \u2192";
+  });
+}
+
+function doLogout(){
+  currentUser=null;chatHistory=[];msgCount=0;attachedFile=null;
+  var btn=document.getElementById("login-btn");
+  btn.textContent="Sign In →";
+  btn.style.background="#A0AEC0";
+  btn.disabled=true;
+  clearChat();
+  ["inp-name","inp-unit","inp-other-role","inp-password"].forEach(function(id){ document.getElementById(id).value=""; });
+  document.getElementById("inp-role").value="";
+  document.getElementById("inp-role").classList.add("placeholder");
+  document.getElementById("other-role-field").style.display="none";
+  ["err-name","err-unit","err-role","err-other-role","err-password","form-warning"].forEach(function(id){ document.getElementById(id).style.display="none"; });
+  ["inp-name","inp-unit","inp-role","inp-password"].forEach(function(id){ document.getElementById(id).classList.remove("error-border"); });
+  document.getElementById("app-screen").style.display="none";
+  document.getElementById("login-screen").style.display="flex";
+  var btn=document.getElementById("login-btn");
+  btn.textContent="Sign In →";
+  btn.style.background="#A0AEC0";
+  btn.disabled=true;
+  checkForm();
+}
+
+function handleFileUpload(e){
+  var file=e.target.files[0];
+  if(!file)return;
+  var maxSize=5*1024*1024;
+  if(file.size>maxSize){
+    alert("File too large. Please upload files under 5MB.");
+    e.target.value="";
+    return;
+  }
+  var reader=new FileReader();
+  reader.onload=function(evt){
+    var content=evt.target.result;
+    if(file.type.startsWith("image/")){
+      attachedFile={name:file.name,content:content.split(",")[1],dataUrl:content,type:file.type,isImage:true};
+      var div=document.getElementById("chat-messages");
+      var empty=document.getElementById("chat-empty");
+      if(empty)empty.style.display="none";
+      var oldPreview=document.getElementById("img-preview-in-chat");
+      if(oldPreview)oldPreview.remove();
+      var previewWrap=document.createElement("div");
+      previewWrap.id="img-preview-in-chat";
+      previewWrap.style.cssText="align-self:flex-end;display:flex;flex-direction:column;align-items:flex-end;gap:4px;";
+      var imgEl=document.createElement("img");
+      imgEl.src=content;
+      imgEl.style.cssText="max-width:220px;max-height:220px;border-radius:10px;object-fit:cover;border:2px solid #BEE3F8;";
+      var label=document.createElement("div");
+      label.style.cssText="font-size:10px;color:#718096;";
+      label.textContent="Image ready - type your question below";
+      previewWrap.appendChild(imgEl);
+      previewWrap.appendChild(label);
+      div.appendChild(previewWrap);
+      previewWrap.scrollIntoView({behavior:"smooth",block:"start"});
+      document.getElementById("file-name-display").textContent=file.name;
+      document.getElementById("file-preview-bar").style.display="flex";
+    } else if(file.type==="application/pdf"){
+      attachedFile={name:file.name,content:content.split(",")[1],type:file.type,isPDF:true};
+      document.getElementById("file-name-display").textContent="PDF: "+file.name;
+      document.getElementById("file-preview-bar").style.display="flex";
+    } else {
+      attachedFile={name:file.name,content:content,type:file.type,isText:true};
+      document.getElementById("file-name-display").textContent="File: "+file.name;
+      document.getElementById("file-preview-bar").style.display="flex";
     }
   };
-
-  function checkForm() {
-    const name = document.getElementById('inp-name').value.trim();
-    const unit = document.getElementById('inp-unit').value.trim();
-    const key = document.getElementById('inp-key').value.trim();
-    const btn = document.getElementById('login-btn');
-    const ready = name && unit && key;
-    btn.disabled = !ready;
-    btn.style.background = ready ? '#2B6CB0' : '#A0AEC0';
+  if(file.type.startsWith("image/")||file.type==="application/pdf"){
+    reader.readAsDataURL(file);
+  } else {
+    reader.readAsText(file);
   }
+  e.target.value="";
+}
 
-  function toggleKey() {
-    const inp = document.getElementById('inp-key');
-    const btn = event.target;
-    if (inp.type === 'password') { inp.type = 'text'; btn.textContent = 'Hide'; }
-    else { inp.type = 'password'; btn.textContent = 'Show'; }
-  }
+function removeFile(){
+  attachedFile=null;
+  document.getElementById("file-preview-bar").style.display="none";
+  var oldPreview=document.getElementById("img-preview-in-chat");
+  if(oldPreview)oldPreview.remove();
+}
 
-  function login() {
-    const name = document.getElementById('inp-name').value.trim();
-    const unit = document.getElementById('inp-unit').value.trim();
-    const role = document.getElementById('inp-role').value;
-    const key = document.getElementById('inp-key').value.trim();
-    if (!name || !unit || !key) { document.getElementById('form-warning').style.display = 'block'; return; }
-    if (!key.startsWith('sk-ant')) { alert('Invalid API key. Must start with sk-ant'); return; }
-    localStorage.setItem('nlp_key', key);
-    currentUser = { name, unit, role, key };
-    const h = new Date().getHours();
-    const greeting = h < 12 ? 'Good Morning' : h < 17 ? 'Good Afternoon' : 'Good Evening';
-    document.getElementById('greet-text').textContent = `${greeting}, ${name}!`;
-    document.getElementById('greet-unit').textContent = `${role} — ${unit}`;
-    document.getElementById('hdr-name').textContent = name;
-    document.getElementById('hdr-role').textContent = role;
-    document.getElementById('hdr-avatar').textContent = name.charAt(0).toUpperCase();
-    document.getElementById('hdr-date').textContent = '📅 ' + new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('app-screen').style.display = 'block';
-  }
+function quickAction(type){ sendToAI(prompts[type],true); }
+function handleKey(e){ if(e.key==="Enter"&&!e.shiftKey){ e.preventDefault(); sendMessage(); } }
+function autoResize(el){ el.style.height="auto"; el.style.height=Math.min(el.scrollHeight,100)+"px"; }
 
-  function logout() {
-    currentUser = null; history = []; clearChat();
-    document.getElementById('app-screen').style.display = 'none';
-    document.getElementById('login-screen').style.display = 'flex';
-  }
-
-  function quickAction(type) { sendToAI(prompts[type], true); }
-  function handleKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }
-  function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 100) + 'px'; }
-
-  function sendMessage() {
-    const inp = document.getElementById('chat-input');
-    const text = inp.value.trim();
-    if (!text || isLoading) return;
-    inp.value = ''; inp.style.height = 'auto';
-    sendToAI(text, false);
-  }
-
-  async function sendToAI(userMsg, isSystem) {
-    if (isLoading) return;
-    isLoading = true;
-    const div = document.getElementById('chat-messages');
-    const empty = document.getElementById('chat-empty');
-    if (empty) empty.style.display = 'none';
-    if (!isSystem) {
-      const u = document.createElement('div');
-      u.className = 'msg user'; u.textContent = userMsg; div.appendChild(u);
+function sendMessage(){
+  var inp=document.getElementById("chat-input");
+  var t=inp.value.trim();
+  if((!t&&!attachedFile)||isLoading)return;
+  if(attachedFile && attachedFile.isImage){
+    var userMsg=t||"Please analyze this image and help me with it.";
+    var imgData=attachedFile.content;
+    var imgType=attachedFile.type;
+    var dataUrl=attachedFile.dataUrl;
+    var oldPreview=document.getElementById("img-preview-in-chat");
+    if(oldPreview){
+      oldPreview.removeAttribute("id");
+      if(t){
+        var txt=document.createElement("div");
+        txt.className="msg user";
+        txt.style.cssText="margin:0;align-self:flex-end;";
+        txt.textContent=t;
+        oldPreview.appendChild(txt);
+      }
     }
-    history.push({ role: 'user', content: userMsg });
-    const loading = document.createElement('div');
-    loading.className = 'msg loading';
-    loading.innerHTML = '<div class="dots"><span></span><span></span><span></span></div>';
-    div.appendChild(loading);
-    div.scrollTop = div.scrollHeight;
-    document.getElementById('send-btn').disabled = true;
-    try {
-      const systemPrompt = `You are NurseLeader Pro, an expert AI assistant for US hospital nursing leaders. Current user: ${currentUser.name}, ${currentUser.role}, ${currentUser.unit} unit. Help with incident reports, staff coverage, director reports, patient responses, staff emails, VRS documentation. Be professional, concise, and use proper medical terminology.`;
-      const res = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: history, systemPrompt, apiKey: currentUser.key })
+    removeFile();
+    inp.value=""; inp.style.height="auto";
+    sendToAIWithImage(userMsg, imgData, imgType);
+  } else if(attachedFile && attachedFile.isPDF){
+    var userMsg=t||"Please analyze this PDF document and help me with it.";
+    var pdfData=attachedFile.content;
+    var fname=attachedFile.name;
+    removeFile();
+    inp.value=""; inp.style.height="auto";
+    sendToAIWithPDF(userMsg, pdfData, fname);
+  } else {
+    var msg=t;
+    if(attachedFile){
+      msg=(t?t+"\n\n":"")+"I have uploaded a file. Here is its content:\n\nFile: "+attachedFile.name+"\n---\n"+attachedFile.content+"\n---\nPlease help me with this.";
+      removeFile();
+    }
+    inp.value=""; inp.style.height="auto";
+    sendToAI(msg,false);
+  }
+}
+
+function renderText(text){
+  var div=document.createElement("div");
+  var lines=text.split("\n");
+  for(var i=0;i<lines.length;i++){
+    var line=lines[i];
+    if(line.match(/^\|[\s\-:|]+\|$/)) continue;
+    if(line.trim().charAt(0)==="|"&&line.trim().charAt(line.trim().length-1)==="|"){
+      var table=div.lastChild;
+      if(!table||table.tagName!=="TABLE"){
+        table=document.createElement("table");
+        div.appendChild(table);
+      }
+      var cells=line.split("|");
+      cells=cells.slice(1,cells.length-1);
+      var tr=document.createElement("tr");
+      var isHeader=(table.rows.length===0);
+      cells.forEach(function(c){
+        var cell=document.createElement(isHeader?"th":"td");
+        cell.textContent=c.trim();
+        tr.appendChild(cell);
       });
-      const data = await res.json();
-      if (!res.ok || !data.text) throw new Error(data.error || 'No response');
-      history.push({ role: 'assistant', content: data.text });
-      loading.remove();
-      const a = document.createElement('div');
-      a.className = 'msg ai'; a.textContent = data.text; div.appendChild(a);
-    } catch (err) {
-      loading.remove();
-      const e = document.createElement('div');
-      e.className = 'msg error'; e.textContent = '⚠️ ' + err.message; div.appendChild(e);
-      history.pop();
+      table.appendChild(tr);
+      continue;
     }
-    isLoading = false;
-    document.getElementById('send-btn').disabled = false;
-    div.scrollTop = div.scrollHeight;
+    if(line.charAt(0)==="#"){
+      var level=0;
+      while(line.charAt(level)==="#") level++;
+      var hEl=document.createElement("h"+Math.min(level,3));
+      hEl.textContent=line.substring(level).trim();
+      div.appendChild(hEl);
+      continue;
+    }
+    if(line.match(/^---+$/)){
+      div.appendChild(document.createElement("hr"));
+      continue;
+    }
+    if(line.match(/^[\-\*] /)||line.match(/^\d+\. /)){
+      var ul=div.lastChild;
+      if(!ul||ul.tagName!=="UL"){
+        ul=document.createElement("ul");
+        div.appendChild(ul);
+      }
+      var li=document.createElement("li");
+      li.innerHTML=formatInline(line.replace(/^[\-\*] /,"").replace(/^\d+\. /,""));
+      ul.appendChild(li);
+      continue;
+    }
+    if(line.trim()===""){
+      div.appendChild(document.createElement("br"));
+      continue;
+    }
+    var p=document.createElement("p");
+    p.innerHTML=formatInline(line);
+    div.appendChild(p);
   }
+  return div;
+}
 
-  function clearChat() {
-    history = [];
-    document.getElementById('chat-messages').innerHTML = `<div class="chat-empty" id="chat-empty"><span style="font-size:32px;opacity:0.4">💬</span><p style="font-size:13px">How can I help you today?</p><small style="font-size:11px">Click any quick action below or type your message</small></div>`;
+function formatInline(text){
+  text=text.replace(/\*\*([^*]+)\*\*/g,"<strong>$1</strong>");
+  text=text.replace(/\*([^*]+)\*/g,"<em>$1</em>");
+  return text;
+}
+
+function sendToAIWithImage(userMsg, imageData, imageType){
+  if(isLoading)return;
+  var div=document.getElementById("chat-messages");
+  if(msgCount>=MAX_MSGS){
+    var e=document.createElement("div");
+    e.className="msg error";
+    e.textContent="You have reached the maximum messages for this session. Please refresh to start a new session.";
+    div.appendChild(e);div.scrollTop=div.scrollHeight;return;
   }
+  isLoading=true;
+  var loading=document.createElement("div");
+  loading.className="msg loading";
+  loading.innerHTML='<div class="dots"><span></span><span></span><span></span></div>';
+  div.appendChild(loading);div.scrollTop=div.scrollHeight;
+  document.getElementById("send-btn").disabled=true;
+  var sp="You are NurseLeader Pro, an advanced AI assistant for hospital nursing leaders and healthcare professionals. Current user: "+currentUser.name+", "+currentUser.role+", "+currentUser.unit+" unit. You have extensive expertise in ALL medical and healthcare fields including but not limited to: clinical nursing practice, cardiac rhythms and EKG/ECG interpretation, lab results and diagnostics, pharmacology and medications, patient assessment and care planning, infection control, emergency protocols, ACLS/BLS/PALS guidelines, incident reports, staff coverage and scheduling, director and administrative reports, patient complaint responses, staff communications, VRS documentation, hospital policies and bylaws, Joint Commission standards, CMS regulations, HIPAA compliance, state nursing board regulations, scope of practice guidelines, medical-legal documentation, and all other hospital administrative and clinical matters. Always respond in the same language the user writes in — if they write in Filipino/Tagalog, respond in Filipino/Tagalog; if in English, respond in English; if mixed, respond in mixed language. Be professional, thorough, and use proper medical terminology. IMPORTANT FORMATTING RULES: 1) Inside table cells, use plain text only — no asterisks, no markdown formatting, no ** or * characters. 2) Do NOT bold text inside tables. 3) Only use bold or markdown outside of tables. 4) Do not add extra formatting unless the user specifically asks for it. 5) Keep table data clean and simple.";
+  var imageMessage={role:"user",content:[
+    {type:"image",source:{type:"base64",media_type:imageType,data:imageData}},
+    {type:"text",text:userMsg}
+  ]};
+  fetch("/api/chat",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({messages:[imageMessage],systemPrompt:sp,password:currentUser.password,hasImage:true})
+  }).then(function(res){
+    return res.json().then(function(d){return{status:res.status,data:d};});
+  }).then(function(result){
+    loading.remove();
+    if(!result.data.text)throw new Error(result.data.error||"No response");
+    chatHistory.push({role:"user",content:userMsg+" [Image]"});
+    chatHistory.push({role:"assistant",content:result.data.text});
+    var a=document.createElement("div");
+    a.className="msg ai";
+    a.appendChild(renderText(result.data.text));
+    div.appendChild(a);
+    setTimeout(function(){
+      var allMsgs = div.querySelectorAll(".msg.user");
+      var lastUserMsg = allMsgs[allMsgs.length - 1];
+      if(lastUserMsg){
+        var rect = lastUserMsg.getBoundingClientRect();
+        var headerHeight = 56;
+        var offset = window.pageYOffset + rect.top - headerHeight - 10;
+        window.scrollTo({top: offset, behavior:"smooth"});
+      }
+    }, 50);
+    msgCount++;
+    var remaining=MAX_MSGS-msgCount;
+    if(remaining<=5&&remaining>0){
+      var w=document.createElement("div");
+      w.style.cssText="background:#FFFBEB;border:2px solid #D69E2E;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:700;color:#744210;align-self:center;text-align:center;max-width:95%;";
+      w.textContent="Warning: "+remaining+" message"+(remaining===1?"":"s")+" remaining in this session.";
+      div.appendChild(w);
+    }
+  }).catch(function(err){
+    loading.remove();
+    var e=document.createElement("div");
+    e.className="msg error";e.textContent="Error: "+err.message;div.appendChild(e);
+  }).finally(function(){
+    isLoading=false;
+    document.getElementById("send-btn").disabled=false;
+    div.scrollTop=div.scrollHeight;
+  });
+}
+
+function sendToAIWithPDF(userMsg, pdfData, fileName){
+  if(isLoading)return;
+  var div=document.getElementById("chat-messages");
+  if(msgCount>=MAX_MSGS){
+    var e=document.createElement("div");
+    e.className="msg error";
+    e.textContent="You have reached the maximum messages for this session. Please refresh to start a new session.";
+    div.appendChild(e);div.scrollTop=div.scrollHeight;return;
+  }
+  isLoading=true;
+  var empty=document.getElementById("chat-empty");
+  if(empty)empty.style.display="none";
+  var u=document.createElement("div");
+  u.className="msg user";
+  u.style.cssText="max-width:85%;align-self:flex-end;display:flex;flex-direction:column;gap:6px;";
+  var fileDiv=document.createElement("div");
+  fileDiv.style.cssText="background:#2B6CB0;color:white;padding:8px 12px;border-radius:8px;font-size:13px;";
+  fileDiv.textContent="PDF: "+fileName+(userMsg?" - "+userMsg:"");
+  u.appendChild(fileDiv);
+  div.appendChild(u);
+  u.scrollIntoView({behavior:"smooth",block:"end"});
+  var loading=document.createElement("div");
+  loading.className="msg loading";
+  loading.innerHTML='<div class="dots"><span></span><span></span><span></span></div>';
+  div.appendChild(loading);
+  document.getElementById("send-btn").disabled=true;
+  var sp="You are NurseLeader Pro, an advanced AI assistant for hospital nursing leaders and healthcare professionals. Current user: "+currentUser.name+", "+currentUser.role+", "+currentUser.unit+" unit. You have extensive expertise in ALL medical and healthcare fields including but not limited to: clinical nursing practice, cardiac rhythms and EKG/ECG interpretation, lab results and diagnostics, pharmacology and medications, patient assessment and care planning, infection control, emergency protocols, ACLS/BLS/PALS guidelines, incident reports, staff coverage and scheduling, director and administrative reports, patient complaint responses, staff communications, VRS documentation, hospital policies and bylaws, Joint Commission standards, CMS regulations, HIPAA compliance, state nursing board regulations, scope of practice guidelines, medical-legal documentation, and all other hospital administrative and clinical matters. Always respond in the same language the user writes in — if they write in Filipino/Tagalog, respond in Filipino/Tagalog; if in English, respond in English; if mixed, respond in mixed language. Be professional, thorough, and use proper medical terminology. IMPORTANT FORMATTING RULES: 1) Inside table cells, use plain text only — no asterisks, no markdown formatting, no ** or * characters. 2) Do NOT bold text inside tables. 3) Only use bold or markdown outside of tables. 4) Do not add extra formatting unless the user specifically asks for it. 5) Keep table data clean and simple.";
+  fetch("/api/chat",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      messages:[{role:"user",content:userMsg}],
+      systemPrompt:sp,
+      password:currentUser.password,
+      fileContent:pdfData,
+      fileName:fileName,
+      fileType:"application/pdf"
+    })
+  }).then(function(res){
+    return res.json().then(function(d){return{status:res.status,data:d};});
+  }).then(function(result){
+    loading.remove();
+    if(!result.data.text)throw new Error(result.data.error||"No response");
+    chatHistory.push({role:"user",content:userMsg+" [PDF: "+fileName+"]"});
+    chatHistory.push({role:"assistant",content:result.data.text});
+    var a=document.createElement("div");
+    a.className="msg ai";
+    a.appendChild(renderText(result.data.text));
+    div.appendChild(a);
+    setTimeout(function(){
+      var allMsgs = div.querySelectorAll(".msg.user");
+      var lastUserMsg = allMsgs[allMsgs.length - 1];
+      if(lastUserMsg){
+        var rect = lastUserMsg.getBoundingClientRect();
+        var headerHeight = 56;
+        var offset = window.pageYOffset + rect.top - headerHeight - 10;
+        window.scrollTo({top: offset, behavior:"smooth"});
+      }
+    }, 50);
+    msgCount++;
+    var remaining=MAX_MSGS-msgCount;
+    if(remaining<=5&&remaining>0){
+      var w=document.createElement("div");
+      w.style.cssText="background:#FFFBEB;border:2px solid #D69E2E;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:700;color:#744210;align-self:center;text-align:center;max-width:95%;";
+      w.textContent="Warning: "+remaining+" message"+(remaining===1?"":"s")+" remaining in this session.";
+      div.appendChild(w);
+    }
+  }).catch(function(err){
+    loading.remove();
+    var e=document.createElement("div");
+    e.className="msg error";e.textContent="Error: "+err.message;div.appendChild(e);
+  }).finally(function(){
+    isLoading=false;
+    document.getElementById("send-btn").disabled=false;
+    div.scrollTop=div.scrollHeight;
+  });
+}
+
+function sendToAI(userMsg,isSystem){
+  if(isLoading)return;
+  var div=document.getElementById("chat-messages");
+  if(msgCount>=MAX_MSGS){
+    var e=document.createElement("div");
+    e.className="msg error";
+    e.style.cssText="align-self:center;text-align:center;max-width:95%;font-weight:600;";
+    e.textContent="You have reached the maximum messages for this session. Please refresh to start a new session.";
+    div.appendChild(e); div.scrollTop=div.scrollHeight; return;
+  }
+  isLoading=true;
+  var empty=document.getElementById("chat-empty");
+  if(empty) empty.style.display="none";
+  if(!isSystem){
+    var u=document.createElement("div");
+    u.className="msg user"; u.textContent=userMsg; div.appendChild(u);
+  }
+  chatHistory.push({role:"user",content:userMsg});
+  var loading=document.createElement("div");
+  loading.className="msg loading";
+  loading.innerHTML='<div class="dots"><span></span><span></span><span></span></div>';
+  div.appendChild(loading); div.scrollTop=div.scrollHeight;
+  document.getElementById("send-btn").disabled=true;
+  var sp="You are NurseLeader Pro, an advanced AI assistant for hospital nursing leaders and healthcare professionals. Current user: "+currentUser.name+", "+currentUser.role+", "+currentUser.unit+" unit. You have extensive expertise in ALL medical and healthcare fields including but not limited to: clinical nursing practice, cardiac rhythms and EKG/ECG interpretation, lab results and diagnostics, pharmacology and medications, patient assessment and care planning, infection control, emergency protocols, ACLS/BLS/PALS guidelines, incident reports, staff coverage and scheduling, director and administrative reports, patient complaint responses, staff communications, VRS documentation, hospital policies and bylaws, Joint Commission standards, CMS regulations, HIPAA compliance, state nursing board regulations, scope of practice guidelines, medical-legal documentation, and all other hospital administrative and clinical matters. Always respond in the same language the user writes in — if they write in Filipino/Tagalog, respond in Filipino/Tagalog; if in English, respond in English; if mixed, respond in mixed language. Be professional, thorough, and use proper medical terminology. IMPORTANT FORMATTING RULES: 1) Inside table cells, use plain text only — no asterisks, no markdown formatting, no ** or * characters. 2) Do NOT bold text inside tables. 3) Only use bold or markdown outside of tables. 4) Do not add extra formatting unless the user specifically asks for it. 5) Keep table data clean and simple.";
+  fetch("/api/chat",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({messages:chatHistory,systemPrompt:sp,password:currentUser.password})
+  }).then(function(res){
+    return res.json().then(function(d){ return {status:res.status,data:d}; });
+  }).then(function(result){
+    loading.remove();
+    if(!result.data.text) throw new Error(result.data.error||"No response");
+    chatHistory.push({role:"assistant",content:result.data.text});
+    var a=document.createElement("div");
+    a.className="msg ai";
+    a.appendChild(renderText(result.data.text));
+    div.appendChild(a);
+    setTimeout(function(){
+      var allMsgs = div.querySelectorAll(".msg.user");
+      var lastUserMsg = allMsgs[allMsgs.length - 1];
+      if(lastUserMsg){
+        var rect = lastUserMsg.getBoundingClientRect();
+        var headerHeight = 56;
+        var offset = window.pageYOffset + rect.top - headerHeight - 10;
+        window.scrollTo({top: offset, behavior:"smooth"});
+      }
+    }, 50);
+    msgCount++;
+    var remaining=MAX_MSGS-msgCount;
+    if(remaining<=5&&remaining>0){
+      var w=document.createElement("div");
+      w.style.cssText="background:#FFFBEB;border:2px solid #D69E2E;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:700;color:#744210;align-self:center;text-align:center;max-width:95%;";
+      w.textContent="Warning: "+remaining+" message"+(remaining===1?"":"s")+" remaining in this session.";
+      div.appendChild(w);
+    }
+  }).catch(function(err){
+    loading.remove();
+    var e=document.createElement("div");
+    e.className="msg error"; e.textContent="Error: "+err.message; div.appendChild(e);
+    chatHistory.pop();
+  }).finally(function(){
+    isLoading=false;
+    document.getElementById("send-btn").disabled=false;
+    div.scrollTop=div.scrollHeight;
+  });
+}
+
+function clearChat(){
+  chatHistory=[]; msgCount=0;
+  document.getElementById("chat-messages").innerHTML='<div class="chat-empty" id="chat-empty"><span style="font-size:48px;opacity:0.5">&#128172;</span><p style="font-size:18px;color:#2D3748;font-weight:700">How can I help you today?</p><small style="font-size:14px;color:#4A5568;font-weight:500">Click any quick action below or type your message</small></div>';
+}
+
 </script>
 </body>
 </html>

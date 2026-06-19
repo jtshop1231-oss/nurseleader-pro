@@ -5,9 +5,32 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>NurseLeader Pro</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/html-docx-js/dist/html-docx.js"></script>
+<script>
+// Word document generator (built-in, no CDN needed)
+window.htmlDocx = {
+  asBlob: function(html) {
+    var mhtml = 'MIME-Version: 1.0\nContent-Type: multipart/related; boundary="----=boundary"\n\n------=boundary\nContent-Type: text/html; charset="utf-8"\n\n' + html + '\n\n------=boundary--';
+    return new Blob([mhtml], {type: 'application/msword'});
+  }
+};
+
+// Lazy load XLSX and Mammoth only when needed
+function loadScript(src, cb) {
+  var s = document.createElement('script');
+  s.src = src;
+  s.onload = cb;
+  s.onerror = function(){ cb(new Error('Failed to load: ' + src)); };
+  document.head.appendChild(s);
+}
+function ensureXLSX(cb) {
+  if(window.XLSX) return cb();
+  loadScript('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js', cb);
+}
+function ensureMammoth(cb) {
+  if(window.mammoth) return cb();
+  loadScript('https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js', cb);
+}
+</script>
 <style>
   :root{--primary:#2B6CB0;--primary-light:#4299E1;--primary-pale:#EBF8FF;--primary-bg:#111111;--white:#FFFFFF;--gray-100:#EDF2F7;--gray-200:#E2E8F0;--gray-400:#A0AEC0;--gray-600:#718096;--gray-800:#2D3748;--red:#E53E3E;--orange:#DD6B20;--green:#38A169;--shadow-sm:0 1px 3px rgba(0,0,0,0.08);--shadow-md:0 4px 16px rgba(43,108,176,0.10);--radius:14px;--radius-sm:8px;}
   *{box-sizing:border-box;margin:0;padding:0;}
@@ -170,7 +193,7 @@ var prompts={
   director:"I need to prepare a report for my director. Please ask me what type of report and the key details, then generate a professional well-formatted report.",
   patient:"I need to draft a professional response to a patient complaint. Please ask me for the details and help me write a compassionate professional response letter.",
   email:"I need to draft a professional staff email. Please ask me what the email is about and who it is for, then help me write a clear professional communication.",
-  vrs:"I need to log a verbal report (VRS) from my staff. Please ask me for the patient name or room, the reporting staff member, and the key information shared, then help me create proper documentation."
+  vrs:"I need to log a VRS Report. Please tell me what happened — just give me the story or description of the event, and I will generate a complete formatted VRS Report for you."
 };
 
 window.onload=function(){ checkForm(); };
@@ -335,30 +358,34 @@ function handleFileUpload(e){
   } else if(fname.endsWith(".xlsx")||fname.endsWith(".xls")){
     var reader=new FileReader();
     reader.onload=function(evt){
-      try{
-        var wb=XLSX.read(evt.target.result,{type:"array"});
-        var textContent="";
-        wb.SheetNames.forEach(function(sheetName){
-          textContent+="Sheet: "+sheetName+"\n";
-          textContent+=XLSX.utils.sheet_to_csv(wb.Sheets[sheetName])+"\n\n";
-        });
-        attachedFile={name:file.name,content:textContent,type:file.type,isText:true};
-        document.getElementById("file-name-display").textContent="File: "+file.name;
-        document.getElementById("file-preview-bar").style.display="flex";
-      }catch(err){
-        alert("Error reading Excel file: "+err.message);
-      }
+      var arrBuf=evt.target.result;
+      ensureXLSX(function(err){
+        if(err){ alert("Could not load Excel reader. Check internet connection."); return; }
+        try{
+          var wb=XLSX.read(arrBuf,{type:"array"});
+          var textContent="";
+          wb.SheetNames.forEach(function(sheetName){
+            textContent+="Sheet: "+sheetName+"\n";
+            textContent+=XLSX.utils.sheet_to_csv(wb.Sheets[sheetName])+"\n\n";
+          });
+          attachedFile={name:file.name,content:textContent,type:file.type,isText:true};
+          document.getElementById("file-name-display").textContent="File: "+file.name;
+          document.getElementById("file-preview-bar").style.display="flex";
+        }catch(err2){ alert("Error reading Excel file: "+err2.message); }
+      });
     };
     reader.readAsArrayBuffer(file);
   } else if(fname.endsWith(".docx")){
     var reader=new FileReader();
     reader.onload=function(evt){
-      mammoth.extractRawText({arrayBuffer:evt.target.result}).then(function(result){
-        attachedFile={name:file.name,content:result.value,type:file.type,isText:true};
-        document.getElementById("file-name-display").textContent="File: "+file.name;
-        document.getElementById("file-preview-bar").style.display="flex";
-      }).catch(function(err){
-        alert("Error reading Word file: "+err.message);
+      var arrBuf=evt.target.result;
+      ensureMammoth(function(err){
+        if(err){ alert("Could not load Word reader. Check internet connection."); return; }
+        mammoth.extractRawText({arrayBuffer:arrBuf}).then(function(result){
+          attachedFile={name:file.name,content:result.value,type:file.type,isText:true};
+          document.getElementById("file-name-display").textContent="File: "+file.name;
+          document.getElementById("file-preview-bar").style.display="flex";
+        }).catch(function(err2){ alert("Error reading Word file: "+err2.message); });
       });
     };
     reader.readAsArrayBuffer(file);
@@ -573,7 +600,27 @@ function sendToAIWithImage(userMsg, imageData, imageType){
   loading.innerHTML='<div class="dots"><span></span><span></span><span></span></div>';
   div.appendChild(loading);div.scrollTop=div.scrollHeight;
   document.getElementById("send-btn").disabled=true;
-  var sp="You are NurseLeader Pro, an advanced AI assistant for hospital nursing leaders and healthcare professionals. Current user: "+currentUser.name+", "+currentUser.role+", "+currentUser.unit+" unit. You have extensive expertise in ALL medical and healthcare fields including but not limited to: clinical nursing practice, cardiac rhythms and EKG/ECG interpretation, lab results and diagnostics, pharmacology and medications, patient assessment and care planning, infection control, emergency protocols, ACLS/BLS/PALS guidelines, incident reports, staff coverage and scheduling, director and administrative reports, patient complaint responses, staff communications, VRS documentation, hospital policies and bylaws, Joint Commission standards, CMS regulations, HIPAA compliance, state nursing board regulations, scope of practice guidelines, medical-legal documentation, and all other hospital administrative and clinical matters. Always respond in the same language the user writes in — if they write in Filipino/Tagalog, respond in Filipino/Tagalog; if in English, respond in English; if mixed, respond in mixed language. Be professional, thorough, and use proper medical terminology. IMPORTANT FORMATTING RULES: 1) Inside table cells, use plain text only — no asterisks, no markdown formatting, no ** or * characters. 2) Do NOT bold text inside tables. 3) Only use bold or markdown outside of tables. 4) Do not add extra formatting unless the user specifically asks for it. 5) Keep table data clean and simple. IMPORTANT DISCLAIMER RULE: If your response involves drafting official documentation such as incident reports, staff coverage requests, director or administrative reports, patient complaint responses, staff emails or other official communications, or VRS (verbal report) documentation - whether the request came from a quick action button or was typed directly in the chat - begin your response with a short disclaimer notice, in the same language as your response, reminding the user that this is an AI-generated draft that must be reviewed and verified for accuracy and compliance with their facility policies, applicable regulations (such as HIPAA, Joint Commission standards, and state nursing board requirements), and chain-of-command approval before official use. Do not add this disclaimer to general informational or educational questions that are not drafting official documentation. FILE GENERATION RULES: If the user explicitly asks you to create, generate, or produce a downloadable Excel spreadsheet or .xlsx file, respond with a short introductory sentence and then include a block that starts with [[EXCEL_START]] on its own line, followed by a line FILENAME: followed by a descriptive filename ending in .xlsx, followed by a valid JSON array of arrays representing the spreadsheet rows (the first inner array should be the column headers, and all values should be JSON strings or numbers), and ending with [[EXCEL_END]] on its own line. If the user explicitly asks you to create, generate, or produce a downloadable Word document or .docx file, respond with a short introductory sentence and then include a block that starts with [[WORD_START]] on its own line, followed by a line FILENAME: followed by a descriptive filename ending in .docx, followed by well-formed HTML content using headings, paragraphs, lists, tables, and bold or italic tags as appropriate, and ending with [[WORD_END]] on its own line. Only include an EXCEL or WORD block when the user specifically requests a downloadable Excel or Word file - never include these blocks for normal chat responses.";
+  var sp="You are NurseLeader Pro, an advanced AI assistant for hospital nursing leaders and healthcare professionals. Current user: "+currentUser.name+", "+currentUser.role+", "+currentUser.unit+" unit. You have extensive expertise in ALL medical and healthcare fields including but not limited to: clinical nursing practice, cardiac rhythms and EKG/ECG interpretation, lab results and diagnostics, pharmacology and medications, patient assessment and care planning, infection control, emergency protocols, ACLS/BLS/PALS guidelines, incident reports, staff coverage and scheduling, director and administrative reports, patient complaint responses, staff communications, VRS documentation, hospital policies and bylaws, Joint Commission standards, CMS regulations, HIPAA compliance, state nursing board regulations, scope of practice guidelines, medical-legal documentation, and all other hospital administrative and clinical matters. Always respond in the same language the user writes in — if they write in Filipino/Tagalog, respond in Filipino/Tagalog; if in English, respond in English; if mixed, respond in mixed language. Be professional, thorough, and use proper medical terminology. IMPORTANT FORMATTING RULES: 1) Inside table cells, use plain text only — no asterisks, no markdown formatting, no ** or * characters. 2) Do NOT bold text inside tables. 3) Only use bold or markdown outside of tables. 4) Do not add extra formatting unless the user specifically asks for it. 5) Keep table data clean and simple. IMPORTANT DISCLAIMER RULE: If your response involves drafting official documentation such as incident reports, staff coverage requests, director or administrative reports, patient complaint responses, staff emails or other official communications, or VRS (verbal report) documentation - whether the request came from a quick action button or was typed directly in the chat - begin your response with a short disclaimer notice, in the same language as your response, reminding the user that this is an AI-generated draft that must be reviewed and verified for accuracy and compliance with their facility policies, applicable regulations (such as HIPAA, Joint Commission standards, and state nursing board requirements), and chain-of-command approval before official use. Do not add this disclaimer to general informational or educational questions that are not drafting official documentation. FILE GENERATION RULES: If the user explicitly asks you to create, generate, or produce a downloadable Excel spreadsheet or .xlsx file, respond with a short introductory sentence and then include a block that starts with [[EXCEL_START]] on its own line, followed by a line FILENAME: followed by a descriptive filename ending in .xlsx, followed by a valid JSON array of arrays representing the spreadsheet rows (the first inner array should be the column headers, and all values should be JSON strings or numbers), and ending with [[EXCEL_END]] on its own line. If the user explicitly asks you to create, generate, or produce a downloadable Word document or .docx file, respond with a short introductory sentence and then include a block that starts with [[WORD_START]] on its own line, followed by a line FILENAME: followed by a descriptive filename ending in .docx, followed by well-formed HTML content using headings, paragraphs, lists, tables, and bold or italic tags as appropriate, and ending with [[WORD_END]] on its own line. Only include an EXCEL or WORD block when the user specifically requests a downloadable Excel or Word file - never include these blocks for normal chat responses. VRS REPORT FORMAT RULE: When the user asks to log a VRS Report or provides a story/description for a VRS, generate a clean formatted VRS Report using only the fields below. Pre-fill Facility and Unit using the user's profile info. Leave blank any field not mentioned by the user. Use this exact format:
+
+VRS Report
+
+Specific Event Type: 
+Type of Person Affected: 
+Injury Incurred: 
+Brief Factual Description: [user's story, written professionally]
+
+Event Date: 
+Incident Time: 
+Facility: 
+Building: 
+Unit: 
+General Area: 
+Service: 
+
+First Name: 
+Last Name:
+
+RESPONSE LENGTH AND TONE: Keep responses concise and direct, especially for clinical or image-based questions - answer the actual question first in plain conversational text without unnecessary headers, tables, or multi-section breakdowns. Only use tables, headers, or detailed comparisons (such as differential diagnoses or feature breakdowns) if the user explicitly asks for a comparison, breakdown, or more detail, or if the question genuinely requires structured data. Avoid restating disclaimers in multiple places within the same response - one short disclaimer line is enough when needed.";
   var imageMessage={role:"user",content:[
     {type:"image",source:{type:"base64",media_type:imageType,data:imageData}},
     {type:"text",text:userMsg}
@@ -581,7 +628,7 @@ function sendToAIWithImage(userMsg, imageData, imageType){
   fetch("/api/chat",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({messages:[imageMessage],systemPrompt:sp,password:currentUser.password,hasImage:true})
+    body:JSON.stringify({messages:chatHistory.concat([imageMessage]),systemPrompt:sp,password:currentUser.password,hasImage:true})
   }).then(function(res){
     return res.json().then(function(d){return{status:res.status,data:d};});
   }).then(function(result){
@@ -648,12 +695,32 @@ function sendToAIWithPDF(userMsg, pdfData, fileName){
   loading.innerHTML='<div class="dots"><span></span><span></span><span></span></div>';
   div.appendChild(loading);
   document.getElementById("send-btn").disabled=true;
-  var sp="You are NurseLeader Pro, an advanced AI assistant for hospital nursing leaders and healthcare professionals. Current user: "+currentUser.name+", "+currentUser.role+", "+currentUser.unit+" unit. You have extensive expertise in ALL medical and healthcare fields including but not limited to: clinical nursing practice, cardiac rhythms and EKG/ECG interpretation, lab results and diagnostics, pharmacology and medications, patient assessment and care planning, infection control, emergency protocols, ACLS/BLS/PALS guidelines, incident reports, staff coverage and scheduling, director and administrative reports, patient complaint responses, staff communications, VRS documentation, hospital policies and bylaws, Joint Commission standards, CMS regulations, HIPAA compliance, state nursing board regulations, scope of practice guidelines, medical-legal documentation, and all other hospital administrative and clinical matters. Always respond in the same language the user writes in — if they write in Filipino/Tagalog, respond in Filipino/Tagalog; if in English, respond in English; if mixed, respond in mixed language. Be professional, thorough, and use proper medical terminology. IMPORTANT FORMATTING RULES: 1) Inside table cells, use plain text only — no asterisks, no markdown formatting, no ** or * characters. 2) Do NOT bold text inside tables. 3) Only use bold or markdown outside of tables. 4) Do not add extra formatting unless the user specifically asks for it. 5) Keep table data clean and simple. IMPORTANT DISCLAIMER RULE: If your response involves drafting official documentation such as incident reports, staff coverage requests, director or administrative reports, patient complaint responses, staff emails or other official communications, or VRS (verbal report) documentation - whether the request came from a quick action button or was typed directly in the chat - begin your response with a short disclaimer notice, in the same language as your response, reminding the user that this is an AI-generated draft that must be reviewed and verified for accuracy and compliance with their facility policies, applicable regulations (such as HIPAA, Joint Commission standards, and state nursing board requirements), and chain-of-command approval before official use. Do not add this disclaimer to general informational or educational questions that are not drafting official documentation. FILE GENERATION RULES: If the user explicitly asks you to create, generate, or produce a downloadable Excel spreadsheet or .xlsx file, respond with a short introductory sentence and then include a block that starts with [[EXCEL_START]] on its own line, followed by a line FILENAME: followed by a descriptive filename ending in .xlsx, followed by a valid JSON array of arrays representing the spreadsheet rows (the first inner array should be the column headers, and all values should be JSON strings or numbers), and ending with [[EXCEL_END]] on its own line. If the user explicitly asks you to create, generate, or produce a downloadable Word document or .docx file, respond with a short introductory sentence and then include a block that starts with [[WORD_START]] on its own line, followed by a line FILENAME: followed by a descriptive filename ending in .docx, followed by well-formed HTML content using headings, paragraphs, lists, tables, and bold or italic tags as appropriate, and ending with [[WORD_END]] on its own line. Only include an EXCEL or WORD block when the user specifically requests a downloadable Excel or Word file - never include these blocks for normal chat responses.";
+  var sp="You are NurseLeader Pro, an advanced AI assistant for hospital nursing leaders and healthcare professionals. Current user: "+currentUser.name+", "+currentUser.role+", "+currentUser.unit+" unit. You have extensive expertise in ALL medical and healthcare fields including but not limited to: clinical nursing practice, cardiac rhythms and EKG/ECG interpretation, lab results and diagnostics, pharmacology and medications, patient assessment and care planning, infection control, emergency protocols, ACLS/BLS/PALS guidelines, incident reports, staff coverage and scheduling, director and administrative reports, patient complaint responses, staff communications, VRS documentation, hospital policies and bylaws, Joint Commission standards, CMS regulations, HIPAA compliance, state nursing board regulations, scope of practice guidelines, medical-legal documentation, and all other hospital administrative and clinical matters. Always respond in the same language the user writes in — if they write in Filipino/Tagalog, respond in Filipino/Tagalog; if in English, respond in English; if mixed, respond in mixed language. Be professional, thorough, and use proper medical terminology. IMPORTANT FORMATTING RULES: 1) Inside table cells, use plain text only — no asterisks, no markdown formatting, no ** or * characters. 2) Do NOT bold text inside tables. 3) Only use bold or markdown outside of tables. 4) Do not add extra formatting unless the user specifically asks for it. 5) Keep table data clean and simple. IMPORTANT DISCLAIMER RULE: If your response involves drafting official documentation such as incident reports, staff coverage requests, director or administrative reports, patient complaint responses, staff emails or other official communications, or VRS (verbal report) documentation - whether the request came from a quick action button or was typed directly in the chat - begin your response with a short disclaimer notice, in the same language as your response, reminding the user that this is an AI-generated draft that must be reviewed and verified for accuracy and compliance with their facility policies, applicable regulations (such as HIPAA, Joint Commission standards, and state nursing board requirements), and chain-of-command approval before official use. Do not add this disclaimer to general informational or educational questions that are not drafting official documentation. FILE GENERATION RULES: If the user explicitly asks you to create, generate, or produce a downloadable Excel spreadsheet or .xlsx file, respond with a short introductory sentence and then include a block that starts with [[EXCEL_START]] on its own line, followed by a line FILENAME: followed by a descriptive filename ending in .xlsx, followed by a valid JSON array of arrays representing the spreadsheet rows (the first inner array should be the column headers, and all values should be JSON strings or numbers), and ending with [[EXCEL_END]] on its own line. If the user explicitly asks you to create, generate, or produce a downloadable Word document or .docx file, respond with a short introductory sentence and then include a block that starts with [[WORD_START]] on its own line, followed by a line FILENAME: followed by a descriptive filename ending in .docx, followed by well-formed HTML content using headings, paragraphs, lists, tables, and bold or italic tags as appropriate, and ending with [[WORD_END]] on its own line. Only include an EXCEL or WORD block when the user specifically requests a downloadable Excel or Word file - never include these blocks for normal chat responses. VRS REPORT FORMAT RULE: When the user asks to log a VRS Report or provides a story/description for a VRS, generate a clean formatted VRS Report using only the fields below. Pre-fill Facility and Unit using the user's profile info. Leave blank any field not mentioned by the user. Use this exact format:
+
+VRS Report
+
+Specific Event Type: 
+Type of Person Affected: 
+Injury Incurred: 
+Brief Factual Description: [user's story, written professionally]
+
+Event Date: 
+Incident Time: 
+Facility: 
+Building: 
+Unit: 
+General Area: 
+Service: 
+
+First Name: 
+Last Name:
+
+RESPONSE LENGTH AND TONE: Keep responses concise and direct, especially for clinical or image-based questions - answer the actual question first in plain conversational text without unnecessary headers, tables, or multi-section breakdowns. Only use tables, headers, or detailed comparisons (such as differential diagnoses or feature breakdowns) if the user explicitly asks for a comparison, breakdown, or more detail, or if the question genuinely requires structured data. Avoid restating disclaimers in multiple places within the same response - one short disclaimer line is enough when needed.";
   fetch("/api/chat",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
     body:JSON.stringify({
-      messages:[{role:"user",content:userMsg}],
+      messages:chatHistory.concat([{role:"user",content:userMsg}]),
       systemPrompt:sp,
       password:currentUser.password,
       fileContent:pdfData,
@@ -723,7 +790,27 @@ function sendToAI(userMsg,isSystem){
   loading.innerHTML='<div class="dots"><span></span><span></span><span></span></div>';
   div.appendChild(loading); div.scrollTop=div.scrollHeight;
   document.getElementById("send-btn").disabled=true;
-  var sp="You are NurseLeader Pro, an advanced AI assistant for hospital nursing leaders and healthcare professionals. Current user: "+currentUser.name+", "+currentUser.role+", "+currentUser.unit+" unit. You have extensive expertise in ALL medical and healthcare fields including but not limited to: clinical nursing practice, cardiac rhythms and EKG/ECG interpretation, lab results and diagnostics, pharmacology and medications, patient assessment and care planning, infection control, emergency protocols, ACLS/BLS/PALS guidelines, incident reports, staff coverage and scheduling, director and administrative reports, patient complaint responses, staff communications, VRS documentation, hospital policies and bylaws, Joint Commission standards, CMS regulations, HIPAA compliance, state nursing board regulations, scope of practice guidelines, medical-legal documentation, and all other hospital administrative and clinical matters. Always respond in the same language the user writes in — if they write in Filipino/Tagalog, respond in Filipino/Tagalog; if in English, respond in English; if mixed, respond in mixed language. Be professional, thorough, and use proper medical terminology. IMPORTANT FORMATTING RULES: 1) Inside table cells, use plain text only — no asterisks, no markdown formatting, no ** or * characters. 2) Do NOT bold text inside tables. 3) Only use bold or markdown outside of tables. 4) Do not add extra formatting unless the user specifically asks for it. 5) Keep table data clean and simple. IMPORTANT DISCLAIMER RULE: If your response involves drafting official documentation such as incident reports, staff coverage requests, director or administrative reports, patient complaint responses, staff emails or other official communications, or VRS (verbal report) documentation - whether the request came from a quick action button or was typed directly in the chat - begin your response with a short disclaimer notice, in the same language as your response, reminding the user that this is an AI-generated draft that must be reviewed and verified for accuracy and compliance with their facility policies, applicable regulations (such as HIPAA, Joint Commission standards, and state nursing board requirements), and chain-of-command approval before official use. Do not add this disclaimer to general informational or educational questions that are not drafting official documentation. FILE GENERATION RULES: If the user explicitly asks you to create, generate, or produce a downloadable Excel spreadsheet or .xlsx file, respond with a short introductory sentence and then include a block that starts with [[EXCEL_START]] on its own line, followed by a line FILENAME: followed by a descriptive filename ending in .xlsx, followed by a valid JSON array of arrays representing the spreadsheet rows (the first inner array should be the column headers, and all values should be JSON strings or numbers), and ending with [[EXCEL_END]] on its own line. If the user explicitly asks you to create, generate, or produce a downloadable Word document or .docx file, respond with a short introductory sentence and then include a block that starts with [[WORD_START]] on its own line, followed by a line FILENAME: followed by a descriptive filename ending in .docx, followed by well-formed HTML content using headings, paragraphs, lists, tables, and bold or italic tags as appropriate, and ending with [[WORD_END]] on its own line. Only include an EXCEL or WORD block when the user specifically requests a downloadable Excel or Word file - never include these blocks for normal chat responses.";
+  var sp="You are NurseLeader Pro, an advanced AI assistant for hospital nursing leaders and healthcare professionals. Current user: "+currentUser.name+", "+currentUser.role+", "+currentUser.unit+" unit. You have extensive expertise in ALL medical and healthcare fields including but not limited to: clinical nursing practice, cardiac rhythms and EKG/ECG interpretation, lab results and diagnostics, pharmacology and medications, patient assessment and care planning, infection control, emergency protocols, ACLS/BLS/PALS guidelines, incident reports, staff coverage and scheduling, director and administrative reports, patient complaint responses, staff communications, VRS documentation, hospital policies and bylaws, Joint Commission standards, CMS regulations, HIPAA compliance, state nursing board regulations, scope of practice guidelines, medical-legal documentation, and all other hospital administrative and clinical matters. Always respond in the same language the user writes in — if they write in Filipino/Tagalog, respond in Filipino/Tagalog; if in English, respond in English; if mixed, respond in mixed language. Be professional, thorough, and use proper medical terminology. IMPORTANT FORMATTING RULES: 1) Inside table cells, use plain text only — no asterisks, no markdown formatting, no ** or * characters. 2) Do NOT bold text inside tables. 3) Only use bold or markdown outside of tables. 4) Do not add extra formatting unless the user specifically asks for it. 5) Keep table data clean and simple. IMPORTANT DISCLAIMER RULE: If your response involves drafting official documentation such as incident reports, staff coverage requests, director or administrative reports, patient complaint responses, staff emails or other official communications, or VRS (verbal report) documentation - whether the request came from a quick action button or was typed directly in the chat - begin your response with a short disclaimer notice, in the same language as your response, reminding the user that this is an AI-generated draft that must be reviewed and verified for accuracy and compliance with their facility policies, applicable regulations (such as HIPAA, Joint Commission standards, and state nursing board requirements), and chain-of-command approval before official use. Do not add this disclaimer to general informational or educational questions that are not drafting official documentation. FILE GENERATION RULES: If the user explicitly asks you to create, generate, or produce a downloadable Excel spreadsheet or .xlsx file, respond with a short introductory sentence and then include a block that starts with [[EXCEL_START]] on its own line, followed by a line FILENAME: followed by a descriptive filename ending in .xlsx, followed by a valid JSON array of arrays representing the spreadsheet rows (the first inner array should be the column headers, and all values should be JSON strings or numbers), and ending with [[EXCEL_END]] on its own line. If the user explicitly asks you to create, generate, or produce a downloadable Word document or .docx file, respond with a short introductory sentence and then include a block that starts with [[WORD_START]] on its own line, followed by a line FILENAME: followed by a descriptive filename ending in .docx, followed by well-formed HTML content using headings, paragraphs, lists, tables, and bold or italic tags as appropriate, and ending with [[WORD_END]] on its own line. Only include an EXCEL or WORD block when the user specifically requests a downloadable Excel or Word file - never include these blocks for normal chat responses. VRS REPORT FORMAT RULE: When the user asks to log a VRS Report or provides a story/description for a VRS, generate a clean formatted VRS Report using only the fields below. Pre-fill Facility and Unit using the user's profile info. Leave blank any field not mentioned by the user. Use this exact format:
+
+VRS Report
+
+Specific Event Type: 
+Type of Person Affected: 
+Injury Incurred: 
+Brief Factual Description: [user's story, written professionally]
+
+Event Date: 
+Incident Time: 
+Facility: 
+Building: 
+Unit: 
+General Area: 
+Service: 
+
+First Name: 
+Last Name:
+
+RESPONSE LENGTH AND TONE: Keep responses concise and direct, especially for clinical or image-based questions - answer the actual question first in plain conversational text without unnecessary headers, tables, or multi-section breakdowns. Only use tables, headers, or detailed comparisons (such as differential diagnoses or feature breakdowns) if the user explicitly asks for a comparison, breakdown, or more detail, or if the question genuinely requires structured data. Avoid restating disclaimers in multiple places within the same response - one short disclaimer line is enough when needed.";
   fetch("/api/chat",{
     method:"POST",
     headers:{"Content-Type":"application/json"},

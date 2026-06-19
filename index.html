@@ -5,64 +5,45 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>NurseLeader Pro</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
-<script>
-// Word document generator (built-in, no CDN needed)
-window.htmlDocx = {
-  asBlob: function(html) {
-    var mhtml = 'MIME-Version: 1.0\nContent-Type: multipart/related; boundary="----=boundary"\n\n------=boundary\nContent-Type: text/html; charset="utf-8"\n\n' + html + '\n\n------=boundary--';
-    return new Blob([mhtml], {type: 'application/msword'});
-  }
-};
 
-// Lazy load XLSX and Mammoth only when needed
-function loadScript(src, cb) {
-  var s = document.createElement('script');
-  s.src = src;
-  s.onload = cb;
-  s.onerror = function(){ cb(new Error('Failed to load: ' + src)); };
-  document.head.appendChild(s);
-}
-function ensureXLSX(cb) {
-  if(window.XLSX) return cb();
-  loadScript('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js', cb);
-}
-function ensureMammoth(cb) {
-  if(window.mammoth) return cb();
-  loadScript('https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js', cb);
-}
+<script>
+window.htmlDocx={asBlob:function(html){var m="MIME-Version: 1.0\r\nContent-Type: multipart/related; boundary=\"----=boundary\"\r\n\r\n------=boundary\r\nContent-Type: text/html; charset=\"utf-8\"\r\n\r\n"+html+"\r\n\r\n------=boundary--";return new Blob([m],{type:"application/msword"});}};
+function loadScript(src,cb){var s=document.createElement("script");s.src=src;s.onload=function(){cb();};s.onerror=function(){cb(new Error("Failed"));};document.head.appendChild(s);}
+function ensureXLSX(cb){if(window.XLSX)return cb();loadScript("https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js",cb);}
+function ensureMammoth(cb){if(window.mammoth)return cb();loadScript("https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js",cb);}
 </script>
 <style>
   :root{--primary:#2B6CB0;--primary-light:#4299E1;--primary-pale:#EBF8FF;--primary-bg:#111111;--white:#FFFFFF;--gray-100:#EDF2F7;--gray-200:#E2E8F0;--gray-400:#A0AEC0;--gray-600:#718096;--gray-800:#2D3748;--red:#E53E3E;--orange:#DD6B20;--green:#38A169;--shadow-sm:0 1px 3px rgba(0,0,0,0.08);--shadow-md:0 4px 16px rgba(43,108,176,0.10);--radius:14px;--radius-sm:8px;}
   *{box-sizing:border-box;margin:0;padding:0;}
-  html,body{width:100%;font-family:"DM Sans",sans-serif;background:#4A5568;color:var(--gray-800);}
+  html,body{width:100%;font-family:"DM Sans",system-ui,sans-serif;background:#4A5568;color:var(--gray-800);}
   #login-screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#2B6CB0,#2C5282,#1A365D);overflow:hidden;}
   .login-card{background:var(--white);border-radius:20px;padding:24px 24px 28px;width:calc(100% - 32px);max-width:400px;box-shadow:0 8px 32px rgba(43,108,176,0.20);text-align:center;max-height:calc(100vh - 40px);overflow-y:auto;border:2px solid #90CDF4;}
   .login-logo{width:80px;height:80px;margin:0 auto 10px;display:block;object-fit:contain;}
-  .login-title{font-family:"DM Serif Display",serif;font-size:24px;color:#1A4A7A;margin-bottom:2px;font-weight:700;}
+  .login-title{font-family:"DM Serif Display",Georgia,serif;font-size:24px;color:#1A4A7A;margin-bottom:2px;font-weight:700;}
   .login-sub{font-size:13px;color:#2D3748;margin-bottom:20px;font-weight:600;}
   .field{margin-bottom:12px;text-align:left;}
   .field label{display:block;font-size:12px;font-weight:900;color:#1A202C;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.8px;}
-  .field input,.field select{width:100%;padding:11px 14px;border:3px solid #2D3748;border-radius:var(--radius-sm);font-family:"DM Sans",sans-serif;font-size:14px;font-weight:400;color:#1A202C;outline:none;transition:border-color 0.2s;background:white;}
+  .field input,.field select{width:100%;padding:11px 14px;border:3px solid #2D3748;border-radius:var(--radius-sm);font-family:"DM Sans",system-ui,sans-serif;font-size:14px;font-weight:400;color:#1A202C;outline:none;transition:border-color 0.2s;background:white;}
   .field input:focus,.field select:focus{border-color:#1A4A7A;}
   .field input::placeholder{color:#718096;}
   .field select.placeholder{color:#718096;}
   .field-error{font-size:11px;color:var(--red);margin-top:4px;display:none;font-weight:600;}
   .field input.error-border,.field select.error-border{border-color:var(--red);}
   .pw-wrap{position:relative;}
-  .show-pw-btn{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:12px;color:#4A5568;font-family:"DM Sans",sans-serif;font-weight:600;}
-  .login-btn{width:100%;padding:13px;background:var(--primary);color:white;border:none;border-radius:var(--radius-sm);font-family:"DM Sans",sans-serif;font-size:15px;font-weight:700;cursor:pointer;margin-top:8px;transition:background 0.2s;}
+  .show-pw-btn{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:12px;color:#4A5568;font-family:"DM Sans",system-ui,sans-serif;font-weight:600;}
+  .login-btn{width:100%;padding:13px;background:var(--primary);color:white;border:none;border-radius:var(--radius-sm);font-family:"DM Sans",system-ui,sans-serif;font-size:15px;font-weight:700;cursor:pointer;margin-top:8px;transition:background 0.2s;}
   .login-btn:disabled{background:#A0AEC0;cursor:not-allowed;}
   #app-screen{display:none;}
   .header{background:var(--white);border-bottom:1px solid var(--gray-100);padding:0 16px;height:56px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow-sm);position:sticky;top:0;z-index:100;}
   .header-left{display:flex;align-items:center;gap:8px;}
-  .brand-name{font-family:"DM Serif Display",serif;font-size:16px;color:#1A4A7A;font-weight:700;}
+  .brand-name{font-family:"DM Serif Display",Georgia,serif;font-size:16px;color:#1A4A7A;font-weight:700;}
   .brand-sub{font-size:9px;color:#4A5568;font-weight:600;}
   .header-right{display:flex;align-items:center;gap:8px;}
   .avatar{width:32px;height:32px;background:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:12px;}
-  .logout-btn{padding:5px 10px;background:#EDF2F7;border:2px solid #4A5568;border-radius:6px;font-size:11px;font-weight:700;color:#2D3748;cursor:pointer;font-family:"DM Sans",sans-serif;}
+  .logout-btn{padding:5px 10px;background:#EDF2F7;border:2px solid #4A5568;border-radius:6px;font-size:11px;font-weight:700;color:#2D3748;cursor:pointer;font-family:"DM Sans",system-ui,sans-serif;}
   .main{max-width:900px;margin:20px auto;padding:24px 32px;background:#89CFF0;border-radius:20px;box-shadow:0 8px 32px rgba(0,0,0,0.30);}
   .greeting{background:linear-gradient(135deg,#2B6CB0,#4299E1);border-radius:var(--radius);padding:16px 20px;color:white;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;}
-  .greeting h2{font-family:"DM Serif Display",serif;font-size:20px;margin-bottom:2px;}
+  .greeting h2{font-family:"DM Serif Display",Georgia,serif;font-size:20px;margin-bottom:2px;}
   .greeting p{font-size:13px;font-weight:600;}
   .chat-card{background:#FFFFFF !important;border-radius:var(--radius);box-shadow:var(--shadow-md);margin-bottom:14px;}
   .chat-header{padding:12px 16px;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;gap:8px;background:#FFFFFF !important;}
@@ -74,7 +55,7 @@ function ensureMammoth(cb) {
   @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
   .msg.ai{background:var(--white);border:1px solid var(--gray-200);align-self:flex-start;box-shadow:var(--shadow-sm);}
   .msg.ai p{margin:4px 0;line-height:1.6;}
-  .msg.ai h1,.msg.ai h2,.msg.ai h3{color:#1A4A7A;font-family:"DM Serif Display",serif;margin:8px 0 4px;}
+  .msg.ai h1,.msg.ai h2,.msg.ai h3{color:#1A4A7A;font-family:"DM Serif Display",Georgia,serif;margin:8px 0 4px;}
   .msg.ai h1{font-size:15px;}.msg.ai h2{font-size:14px;}.msg.ai h3{font-size:13px;}
   .msg.ai strong{color:#1A202C;font-weight:700;}
   .msg.ai ul{margin:4px 0 4px 16px;line-height:1.8;}
@@ -94,17 +75,17 @@ function ensureMammoth(cb) {
   .chat-input-area{padding:10px 14px;border-top:1px solid var(--gray-100);display:flex;gap:8px;align-items:center;background:#FFFFFF !important;position:sticky;bottom:0;z-index:50;}
   .upload-btn{padding:8px 12px;background:#EDF2F7;color:#2B6CB0;border:2px solid #4A5568;border-radius:8px;cursor:pointer;font-size:20px;font-weight:700;line-height:1;flex-shrink:0;}
 
-  .chat-input{flex:1;padding:9px 12px;border:2px solid #718096;border-radius:8px;font-family:"DM Sans",sans-serif;font-size:13px;outline:none;resize:none;color:#1A202C;}
+  .chat-input{flex:1;padding:9px 12px;border:2px solid #718096;border-radius:8px;font-family:"DM Sans",system-ui,sans-serif;font-size:13px;outline:none;resize:none;color:#1A202C;}
   .chat-input::placeholder{color:#4A5568;}
   .chat-input:focus{border-color:var(--primary-light);}
   .send-btn{padding:9px 14px;background:var(--primary);color:white;border:none;border-radius:8px;cursor:pointer;font-size:16px;flex-shrink:0;}
   .send-btn:disabled{background:var(--gray-200);cursor:not-allowed;}
-  .clear-btn{padding:9px 10px;background:#EDF2F7;color:#2D3748;border:2px solid #4A5568;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;font-family:"DM Sans",sans-serif;flex-shrink:0;}
+  .clear-btn{padding:9px 10px;background:#EDF2F7;color:#2D3748;border:2px solid #4A5568;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;font-family:"DM Sans",system-ui,sans-serif;flex-shrink:0;}
   .file-preview{background:#EBF8FF;border:1px solid #90CDF4;border-radius:8px;padding:6px 10px;font-size:11px;color:#2B6CB0;font-weight:600;display:none;align-items:center;gap:6px;margin:0 14px 6px;}
   .file-preview .remove-file{cursor:pointer;color:#E53E3E;font-weight:700;margin-left:auto;}
   .section-title{font-size:12px;font-weight:800;color:#1A202C;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;}
   .quick-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
-  .action-btn{background:#FFFFFF !important;border:2px solid #A0AEC0;border-radius:var(--radius-sm);padding:10px 8px;cursor:pointer;text-align:left;font-family:"DM Sans",sans-serif;display:flex;flex-direction:column;gap:4px;box-shadow:var(--shadow-sm);transition:all 0.2s;}
+  .action-btn{background:#FFFFFF !important;border:2px solid #A0AEC0;border-radius:var(--radius-sm);padding:10px 8px;cursor:pointer;text-align:left;font-family:"DM Sans",system-ui,sans-serif;display:flex;flex-direction:column;gap:4px;box-shadow:var(--shadow-sm);transition:all 0.2s;}
   .action-btn:hover{border-color:var(--primary-light);background:var(--primary-pale);transform:translateY(-2px);}
   .action-icon{font-size:18px;}
   .action-label{font-size:12px;font-weight:800;color:#1A202C;line-height:1.3;}
@@ -134,7 +115,7 @@ function ensureMammoth(cb) {
     <p class="login-sub">Hospital Management Dashboard</p>
     <div class="field"><label>Full Name</label><input type="text" id="inp-name" placeholder="Enter your full name" oninput="checkForm()" onkeyup="checkForm()" onblur="validateField('inp-name','err-name')" onkeydown="if(event.key==='Enter') doLogin()"><div class="field-error" id="err-name">Please enter your full name.</div></div>
     <div class="field"><label>Unit / Department</label><input type="text" id="inp-unit" placeholder="e.g. IMU, ICU, Med-Surg" oninput="checkForm()" onkeyup="checkForm()" onblur="validateField('inp-unit','err-unit')" onkeydown="if(event.key==='Enter') doLogin()"><div class="field-error" id="err-unit">Please enter your unit or department.</div></div>
-    <div class="field"><label>Role</label><select id="inp-role" onchange="handleRoleChange()" onkeyup="checkForm()" class="placeholder"><option value="" disabled selected>Please select your role from the dropdown</option><option value="Nursing Manager">Nursing Manager</option><option value="Nursing Director">Nursing Director</option><option value="Charge Nurse">Charge Nurse</option><option value="Nursing Supervisor">Nursing Supervisor</option><option value="Others">Others</option></select><div class="field-error" id="err-role">Please select your role.</div></div>
+    <div class="field"><label>Role</label><select id="inp-role" onchange="handleRoleChange()" oninput="handleRoleChange()" onclick="handleRoleChange()" onkeyup="handleRoleChange()" class="placeholder"><option value="" disabled selected>Please select your role from the dropdown</option><option value="Nursing Manager">Nursing Manager</option><option value="Nursing Director">Nursing Director</option><option value="Charge Nurse">Charge Nurse</option><option value="Nursing Supervisor">Nursing Supervisor</option><option value="Others">Others</option></select><div class="field-error" id="err-role">Please select your role.</div></div>
     <div class="field" id="other-role-field" style="display:none"><label>Please Specify Your Role</label><input type="text" id="inp-other-role" placeholder="e.g. Staff Nurse, CNA, LPN..." oninput="checkForm()"><div class="field-error" id="err-other-role">Please specify your role.</div></div>
     <div class="field"><label>&#128274; Access Password</label><div class="pw-wrap"><input type="password" id="inp-password" placeholder="Enter access password" oninput="checkForm()" onkeyup="checkForm()" onkeydown="if(event.key==='Enter') doLogin()" style="padding-right:60px"><button class="show-pw-btn" onclick="togglePw()">Show</button></div><div class="field-error" id="err-password">Please enter the access password.</div></div>
     <div id="form-warning" style="background:#FFF5F5;border:1px solid #FC8181;border-radius:8px;padding:8px 12px;font-size:12px;color:#E53E3E;margin-bottom:8px;display:none;">Please fill in all required fields.</div>
@@ -228,15 +209,9 @@ function checkForm(){
   var other=isOthers?document.getElementById("inp-other-role").value.trim():"x";
   var ok=(n&&u&&r&&p&&other)?true:false;
   var btn=document.getElementById("login-btn");
-  if(ok){
-    btn.removeAttribute("disabled");
-    btn.style.background="#2B6CB0";
-    btn.style.cursor="pointer";
-  } else {
-    btn.setAttribute("disabled","true");
-    btn.style.background="#A0AEC0";
-    btn.style.cursor="not-allowed";
-  }
+  btn.disabled=!ok;
+  btn.style.background=ok?"#2B6CB0":"#A0AEC0";
+  btn.style.cursor=ok?"pointer":"not-allowed";
 }
 
 function togglePw(){
@@ -608,27 +583,7 @@ function sendToAIWithImage(userMsg, imageData, imageType){
   loading.innerHTML='<div class="dots"><span></span><span></span><span></span></div>';
   div.appendChild(loading);div.scrollTop=div.scrollHeight;
   document.getElementById("send-btn").disabled=true;
-  var sp="You are NurseLeader Pro, an advanced AI assistant for hospital nursing leaders and healthcare professionals. Current user: "+currentUser.name+", "+currentUser.role+", "+currentUser.unit+" unit. You have extensive expertise in ALL medical and healthcare fields including but not limited to: clinical nursing practice, cardiac rhythms and EKG/ECG interpretation, lab results and diagnostics, pharmacology and medications, patient assessment and care planning, infection control, emergency protocols, ACLS/BLS/PALS guidelines, incident reports, staff coverage and scheduling, director and administrative reports, patient complaint responses, staff communications, VRS documentation, hospital policies and bylaws, Joint Commission standards, CMS regulations, HIPAA compliance, state nursing board regulations, scope of practice guidelines, medical-legal documentation, and all other hospital administrative and clinical matters. Always respond in the same language the user writes in — if they write in Filipino/Tagalog, respond in Filipino/Tagalog; if in English, respond in English; if mixed, respond in mixed language. Be professional, thorough, and use proper medical terminology. IMPORTANT FORMATTING RULES: 1) Inside table cells, use plain text only — no asterisks, no markdown formatting, no ** or * characters. 2) Do NOT bold text inside tables. 3) Only use bold or markdown outside of tables. 4) Do not add extra formatting unless the user specifically asks for it. 5) Keep table data clean and simple. IMPORTANT DISCLAIMER RULE: If your response involves drafting official documentation such as incident reports, staff coverage requests, director or administrative reports, patient complaint responses, staff emails or other official communications, or VRS (verbal report) documentation - whether the request came from a quick action button or was typed directly in the chat - begin your response with a short disclaimer notice, in the same language as your response, reminding the user that this is an AI-generated draft that must be reviewed and verified for accuracy and compliance with their facility policies, applicable regulations (such as HIPAA, Joint Commission standards, and state nursing board requirements), and chain-of-command approval before official use. Do not add this disclaimer to general informational or educational questions that are not drafting official documentation. FILE GENERATION RULES: If the user explicitly asks you to create, generate, or produce a downloadable Excel spreadsheet or .xlsx file, respond with a short introductory sentence and then include a block that starts with [[EXCEL_START]] on its own line, followed by a line FILENAME: followed by a descriptive filename ending in .xlsx, followed by a valid JSON array of arrays representing the spreadsheet rows (the first inner array should be the column headers, and all values should be JSON strings or numbers), and ending with [[EXCEL_END]] on its own line. If the user explicitly asks you to create, generate, or produce a downloadable Word document or .docx file, respond with a short introductory sentence and then include a block that starts with [[WORD_START]] on its own line, followed by a line FILENAME: followed by a descriptive filename ending in .docx, followed by well-formed HTML content using headings, paragraphs, lists, tables, and bold or italic tags as appropriate, and ending with [[WORD_END]] on its own line. Only include an EXCEL or WORD block when the user specifically requests a downloadable Excel or Word file - never include these blocks for normal chat responses. VRS REPORT FORMAT RULE: When the user asks to log a VRS Report or provides a story/description for a VRS, generate a clean formatted VRS Report using only the fields below. Pre-fill Facility and Unit using the user's profile info. Leave blank any field not mentioned by the user. Use this exact format:
-
-VRS Report
-
-Specific Event Type: 
-Type of Person Affected: 
-Injury Incurred: 
-Brief Factual Description: [user's story, written professionally]
-
-Event Date: 
-Incident Time: 
-Facility: 
-Building: 
-Unit: 
-General Area: 
-Service: 
-
-First Name: 
-Last Name:
-
-RESPONSE LENGTH AND TONE: Keep responses concise and direct, especially for clinical or image-based questions - answer the actual question first in plain conversational text without unnecessary headers, tables, or multi-section breakdowns. Only use tables, headers, or detailed comparisons (such as differential diagnoses or feature breakdowns) if the user explicitly asks for a comparison, breakdown, or more detail, or if the question genuinely requires structured data. Avoid restating disclaimers in multiple places within the same response - one short disclaimer line is enough when needed.";
+  var sp="You are NurseLeader Pro, an advanced AI assistant for hospital nursing leaders and healthcare professionals. Current user: "+currentUser.name+", "+currentUser.role+", "+currentUser.unit+" unit. You have extensive expertise in ALL medical and healthcare fields including but not limited to: clinical nursing practice, cardiac rhythms and EKG/ECG interpretation, lab results and diagnostics, pharmacology and medications, patient assessment and care planning, infection control, emergency protocols, ACLS/BLS/PALS guidelines, incident reports, staff coverage and scheduling, director and administrative reports, patient complaint responses, staff communications, VRS documentation, hospital policies and bylaws, Joint Commission standards, CMS regulations, HIPAA compliance, state nursing board regulations, scope of practice guidelines, medical-legal documentation, and all other hospital administrative and clinical matters. Always respond in the same language the user writes in — if they write in Filipino/Tagalog, respond in Filipino/Tagalog; if in English, respond in English; if mixed, respond in mixed language. Be professional, thorough, and use proper medical terminology. IMPORTANT FORMATTING RULES: 1) Inside table cells, use plain text only — no asterisks, no markdown formatting, no ** or * characters. 2) Do NOT bold text inside tables. 3) Only use bold or markdown outside of tables. 4) Do not add extra formatting unless the user specifically asks for it. 5) Keep table data clean and simple. IMPORTANT DISCLAIMER RULE: If your response involves drafting official documentation such as incident reports, staff coverage requests, director or administrative reports, patient complaint responses, staff emails or other official communications, or VRS (verbal report) documentation - whether the request came from a quick action button or was typed directly in the chat - begin your response with a short disclaimer notice, in the same language as your response, reminding the user that this is an AI-generated draft that must be reviewed and verified for accuracy and compliance with their facility policies, applicable regulations (such as HIPAA, Joint Commission standards, and state nursing board requirements), and chain-of-command approval before official use. Do not add this disclaimer to general informational or educational questions that are not drafting official documentation. FILE GENERATION RULES: If the user explicitly asks you to create, generate, or produce a downloadable Excel spreadsheet or .xlsx file, respond with a short introductory sentence and then include a block that starts with [[EXCEL_START]] on its own line, followed by a line FILENAME: followed by a descriptive filename ending in .xlsx, followed by a valid JSON array of arrays representing the spreadsheet rows (the first inner array should be the column headers, and all values should be JSON strings or numbers), and ending with [[EXCEL_END]] on its own line. If the user explicitly asks you to create, generate, or produce a downloadable Word document or .docx file, respond with a short introductory sentence and then include a block that starts with [[WORD_START]] on its own line, followed by a line FILENAME: followed by a descriptive filename ending in .docx, followed by well-formed HTML content using headings, paragraphs, lists, tables, and bold or italic tags as appropriate, and ending with [[WORD_END]] on its own line. Only include an EXCEL or WORD block when the user specifically requests a downloadable Excel or Word file - never include these blocks for normal chat responses. VRS REPORT FORMAT RULE: When the user asks to log a VRS Report or provides a story or description for a VRS, generate a clean formatted VRS Report. Pre-fill Facility and Unit from the user profile. Leave blank any field not mentioned. Use this format: VRS Report | Specific Event Type: | Type of Person Affected: | Injury Incurred: | Brief Factual Description: [story written professionally] | Event Date: | Incident Time: | Facility: | Building: | Unit: | General Area: | Service: | First Name: | Last Name: RESPONSE LENGTH AND TONE: Keep responses concise and direct, especially for clinical or image-based questions - answer the actual question first in plain conversational text without unnecessary headers, tables, or multi-section breakdowns. Only use tables, headers, or detailed comparisons (such as differential diagnoses or feature breakdowns) if the user explicitly asks for a comparison, breakdown, or more detail, or if the question genuinely requires structured data. Avoid restating disclaimers in multiple places within the same response - one short disclaimer line is enough when needed.";
   var imageMessage={role:"user",content:[
     {type:"image",source:{type:"base64",media_type:imageType,data:imageData}},
     {type:"text",text:userMsg}
@@ -703,27 +658,7 @@ function sendToAIWithPDF(userMsg, pdfData, fileName){
   loading.innerHTML='<div class="dots"><span></span><span></span><span></span></div>';
   div.appendChild(loading);
   document.getElementById("send-btn").disabled=true;
-  var sp="You are NurseLeader Pro, an advanced AI assistant for hospital nursing leaders and healthcare professionals. Current user: "+currentUser.name+", "+currentUser.role+", "+currentUser.unit+" unit. You have extensive expertise in ALL medical and healthcare fields including but not limited to: clinical nursing practice, cardiac rhythms and EKG/ECG interpretation, lab results and diagnostics, pharmacology and medications, patient assessment and care planning, infection control, emergency protocols, ACLS/BLS/PALS guidelines, incident reports, staff coverage and scheduling, director and administrative reports, patient complaint responses, staff communications, VRS documentation, hospital policies and bylaws, Joint Commission standards, CMS regulations, HIPAA compliance, state nursing board regulations, scope of practice guidelines, medical-legal documentation, and all other hospital administrative and clinical matters. Always respond in the same language the user writes in — if they write in Filipino/Tagalog, respond in Filipino/Tagalog; if in English, respond in English; if mixed, respond in mixed language. Be professional, thorough, and use proper medical terminology. IMPORTANT FORMATTING RULES: 1) Inside table cells, use plain text only — no asterisks, no markdown formatting, no ** or * characters. 2) Do NOT bold text inside tables. 3) Only use bold or markdown outside of tables. 4) Do not add extra formatting unless the user specifically asks for it. 5) Keep table data clean and simple. IMPORTANT DISCLAIMER RULE: If your response involves drafting official documentation such as incident reports, staff coverage requests, director or administrative reports, patient complaint responses, staff emails or other official communications, or VRS (verbal report) documentation - whether the request came from a quick action button or was typed directly in the chat - begin your response with a short disclaimer notice, in the same language as your response, reminding the user that this is an AI-generated draft that must be reviewed and verified for accuracy and compliance with their facility policies, applicable regulations (such as HIPAA, Joint Commission standards, and state nursing board requirements), and chain-of-command approval before official use. Do not add this disclaimer to general informational or educational questions that are not drafting official documentation. FILE GENERATION RULES: If the user explicitly asks you to create, generate, or produce a downloadable Excel spreadsheet or .xlsx file, respond with a short introductory sentence and then include a block that starts with [[EXCEL_START]] on its own line, followed by a line FILENAME: followed by a descriptive filename ending in .xlsx, followed by a valid JSON array of arrays representing the spreadsheet rows (the first inner array should be the column headers, and all values should be JSON strings or numbers), and ending with [[EXCEL_END]] on its own line. If the user explicitly asks you to create, generate, or produce a downloadable Word document or .docx file, respond with a short introductory sentence and then include a block that starts with [[WORD_START]] on its own line, followed by a line FILENAME: followed by a descriptive filename ending in .docx, followed by well-formed HTML content using headings, paragraphs, lists, tables, and bold or italic tags as appropriate, and ending with [[WORD_END]] on its own line. Only include an EXCEL or WORD block when the user specifically requests a downloadable Excel or Word file - never include these blocks for normal chat responses. VRS REPORT FORMAT RULE: When the user asks to log a VRS Report or provides a story/description for a VRS, generate a clean formatted VRS Report using only the fields below. Pre-fill Facility and Unit using the user's profile info. Leave blank any field not mentioned by the user. Use this exact format:
-
-VRS Report
-
-Specific Event Type: 
-Type of Person Affected: 
-Injury Incurred: 
-Brief Factual Description: [user's story, written professionally]
-
-Event Date: 
-Incident Time: 
-Facility: 
-Building: 
-Unit: 
-General Area: 
-Service: 
-
-First Name: 
-Last Name:
-
-RESPONSE LENGTH AND TONE: Keep responses concise and direct, especially for clinical or image-based questions - answer the actual question first in plain conversational text without unnecessary headers, tables, or multi-section breakdowns. Only use tables, headers, or detailed comparisons (such as differential diagnoses or feature breakdowns) if the user explicitly asks for a comparison, breakdown, or more detail, or if the question genuinely requires structured data. Avoid restating disclaimers in multiple places within the same response - one short disclaimer line is enough when needed.";
+  var sp="You are NurseLeader Pro, an advanced AI assistant for hospital nursing leaders and healthcare professionals. Current user: "+currentUser.name+", "+currentUser.role+", "+currentUser.unit+" unit. You have extensive expertise in ALL medical and healthcare fields including but not limited to: clinical nursing practice, cardiac rhythms and EKG/ECG interpretation, lab results and diagnostics, pharmacology and medications, patient assessment and care planning, infection control, emergency protocols, ACLS/BLS/PALS guidelines, incident reports, staff coverage and scheduling, director and administrative reports, patient complaint responses, staff communications, VRS documentation, hospital policies and bylaws, Joint Commission standards, CMS regulations, HIPAA compliance, state nursing board regulations, scope of practice guidelines, medical-legal documentation, and all other hospital administrative and clinical matters. Always respond in the same language the user writes in — if they write in Filipino/Tagalog, respond in Filipino/Tagalog; if in English, respond in English; if mixed, respond in mixed language. Be professional, thorough, and use proper medical terminology. IMPORTANT FORMATTING RULES: 1) Inside table cells, use plain text only — no asterisks, no markdown formatting, no ** or * characters. 2) Do NOT bold text inside tables. 3) Only use bold or markdown outside of tables. 4) Do not add extra formatting unless the user specifically asks for it. 5) Keep table data clean and simple. IMPORTANT DISCLAIMER RULE: If your response involves drafting official documentation such as incident reports, staff coverage requests, director or administrative reports, patient complaint responses, staff emails or other official communications, or VRS (verbal report) documentation - whether the request came from a quick action button or was typed directly in the chat - begin your response with a short disclaimer notice, in the same language as your response, reminding the user that this is an AI-generated draft that must be reviewed and verified for accuracy and compliance with their facility policies, applicable regulations (such as HIPAA, Joint Commission standards, and state nursing board requirements), and chain-of-command approval before official use. Do not add this disclaimer to general informational or educational questions that are not drafting official documentation. FILE GENERATION RULES: If the user explicitly asks you to create, generate, or produce a downloadable Excel spreadsheet or .xlsx file, respond with a short introductory sentence and then include a block that starts with [[EXCEL_START]] on its own line, followed by a line FILENAME: followed by a descriptive filename ending in .xlsx, followed by a valid JSON array of arrays representing the spreadsheet rows (the first inner array should be the column headers, and all values should be JSON strings or numbers), and ending with [[EXCEL_END]] on its own line. If the user explicitly asks you to create, generate, or produce a downloadable Word document or .docx file, respond with a short introductory sentence and then include a block that starts with [[WORD_START]] on its own line, followed by a line FILENAME: followed by a descriptive filename ending in .docx, followed by well-formed HTML content using headings, paragraphs, lists, tables, and bold or italic tags as appropriate, and ending with [[WORD_END]] on its own line. Only include an EXCEL or WORD block when the user specifically requests a downloadable Excel or Word file - never include these blocks for normal chat responses. VRS REPORT FORMAT RULE: When the user asks to log a VRS Report or provides a story or description for a VRS, generate a clean formatted VRS Report. Pre-fill Facility and Unit from the user profile. Leave blank any field not mentioned. Use this format: VRS Report | Specific Event Type: | Type of Person Affected: | Injury Incurred: | Brief Factual Description: [story written professionally] | Event Date: | Incident Time: | Facility: | Building: | Unit: | General Area: | Service: | First Name: | Last Name: RESPONSE LENGTH AND TONE: Keep responses concise and direct, especially for clinical or image-based questions - answer the actual question first in plain conversational text without unnecessary headers, tables, or multi-section breakdowns. Only use tables, headers, or detailed comparisons (such as differential diagnoses or feature breakdowns) if the user explicitly asks for a comparison, breakdown, or more detail, or if the question genuinely requires structured data. Avoid restating disclaimers in multiple places within the same response - one short disclaimer line is enough when needed.";
   fetch("/api/chat",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
@@ -798,27 +733,7 @@ function sendToAI(userMsg,isSystem){
   loading.innerHTML='<div class="dots"><span></span><span></span><span></span></div>';
   div.appendChild(loading); div.scrollTop=div.scrollHeight;
   document.getElementById("send-btn").disabled=true;
-  var sp="You are NurseLeader Pro, an advanced AI assistant for hospital nursing leaders and healthcare professionals. Current user: "+currentUser.name+", "+currentUser.role+", "+currentUser.unit+" unit. You have extensive expertise in ALL medical and healthcare fields including but not limited to: clinical nursing practice, cardiac rhythms and EKG/ECG interpretation, lab results and diagnostics, pharmacology and medications, patient assessment and care planning, infection control, emergency protocols, ACLS/BLS/PALS guidelines, incident reports, staff coverage and scheduling, director and administrative reports, patient complaint responses, staff communications, VRS documentation, hospital policies and bylaws, Joint Commission standards, CMS regulations, HIPAA compliance, state nursing board regulations, scope of practice guidelines, medical-legal documentation, and all other hospital administrative and clinical matters. Always respond in the same language the user writes in — if they write in Filipino/Tagalog, respond in Filipino/Tagalog; if in English, respond in English; if mixed, respond in mixed language. Be professional, thorough, and use proper medical terminology. IMPORTANT FORMATTING RULES: 1) Inside table cells, use plain text only — no asterisks, no markdown formatting, no ** or * characters. 2) Do NOT bold text inside tables. 3) Only use bold or markdown outside of tables. 4) Do not add extra formatting unless the user specifically asks for it. 5) Keep table data clean and simple. IMPORTANT DISCLAIMER RULE: If your response involves drafting official documentation such as incident reports, staff coverage requests, director or administrative reports, patient complaint responses, staff emails or other official communications, or VRS (verbal report) documentation - whether the request came from a quick action button or was typed directly in the chat - begin your response with a short disclaimer notice, in the same language as your response, reminding the user that this is an AI-generated draft that must be reviewed and verified for accuracy and compliance with their facility policies, applicable regulations (such as HIPAA, Joint Commission standards, and state nursing board requirements), and chain-of-command approval before official use. Do not add this disclaimer to general informational or educational questions that are not drafting official documentation. FILE GENERATION RULES: If the user explicitly asks you to create, generate, or produce a downloadable Excel spreadsheet or .xlsx file, respond with a short introductory sentence and then include a block that starts with [[EXCEL_START]] on its own line, followed by a line FILENAME: followed by a descriptive filename ending in .xlsx, followed by a valid JSON array of arrays representing the spreadsheet rows (the first inner array should be the column headers, and all values should be JSON strings or numbers), and ending with [[EXCEL_END]] on its own line. If the user explicitly asks you to create, generate, or produce a downloadable Word document or .docx file, respond with a short introductory sentence and then include a block that starts with [[WORD_START]] on its own line, followed by a line FILENAME: followed by a descriptive filename ending in .docx, followed by well-formed HTML content using headings, paragraphs, lists, tables, and bold or italic tags as appropriate, and ending with [[WORD_END]] on its own line. Only include an EXCEL or WORD block when the user specifically requests a downloadable Excel or Word file - never include these blocks for normal chat responses. VRS REPORT FORMAT RULE: When the user asks to log a VRS Report or provides a story/description for a VRS, generate a clean formatted VRS Report using only the fields below. Pre-fill Facility and Unit using the user's profile info. Leave blank any field not mentioned by the user. Use this exact format:
-
-VRS Report
-
-Specific Event Type: 
-Type of Person Affected: 
-Injury Incurred: 
-Brief Factual Description: [user's story, written professionally]
-
-Event Date: 
-Incident Time: 
-Facility: 
-Building: 
-Unit: 
-General Area: 
-Service: 
-
-First Name: 
-Last Name:
-
-RESPONSE LENGTH AND TONE: Keep responses concise and direct, especially for clinical or image-based questions - answer the actual question first in plain conversational text without unnecessary headers, tables, or multi-section breakdowns. Only use tables, headers, or detailed comparisons (such as differential diagnoses or feature breakdowns) if the user explicitly asks for a comparison, breakdown, or more detail, or if the question genuinely requires structured data. Avoid restating disclaimers in multiple places within the same response - one short disclaimer line is enough when needed.";
+  var sp="You are NurseLeader Pro, an advanced AI assistant for hospital nursing leaders and healthcare professionals. Current user: "+currentUser.name+", "+currentUser.role+", "+currentUser.unit+" unit. You have extensive expertise in ALL medical and healthcare fields including but not limited to: clinical nursing practice, cardiac rhythms and EKG/ECG interpretation, lab results and diagnostics, pharmacology and medications, patient assessment and care planning, infection control, emergency protocols, ACLS/BLS/PALS guidelines, incident reports, staff coverage and scheduling, director and administrative reports, patient complaint responses, staff communications, VRS documentation, hospital policies and bylaws, Joint Commission standards, CMS regulations, HIPAA compliance, state nursing board regulations, scope of practice guidelines, medical-legal documentation, and all other hospital administrative and clinical matters. Always respond in the same language the user writes in — if they write in Filipino/Tagalog, respond in Filipino/Tagalog; if in English, respond in English; if mixed, respond in mixed language. Be professional, thorough, and use proper medical terminology. IMPORTANT FORMATTING RULES: 1) Inside table cells, use plain text only — no asterisks, no markdown formatting, no ** or * characters. 2) Do NOT bold text inside tables. 3) Only use bold or markdown outside of tables. 4) Do not add extra formatting unless the user specifically asks for it. 5) Keep table data clean and simple. IMPORTANT DISCLAIMER RULE: If your response involves drafting official documentation such as incident reports, staff coverage requests, director or administrative reports, patient complaint responses, staff emails or other official communications, or VRS (verbal report) documentation - whether the request came from a quick action button or was typed directly in the chat - begin your response with a short disclaimer notice, in the same language as your response, reminding the user that this is an AI-generated draft that must be reviewed and verified for accuracy and compliance with their facility policies, applicable regulations (such as HIPAA, Joint Commission standards, and state nursing board requirements), and chain-of-command approval before official use. Do not add this disclaimer to general informational or educational questions that are not drafting official documentation. FILE GENERATION RULES: If the user explicitly asks you to create, generate, or produce a downloadable Excel spreadsheet or .xlsx file, respond with a short introductory sentence and then include a block that starts with [[EXCEL_START]] on its own line, followed by a line FILENAME: followed by a descriptive filename ending in .xlsx, followed by a valid JSON array of arrays representing the spreadsheet rows (the first inner array should be the column headers, and all values should be JSON strings or numbers), and ending with [[EXCEL_END]] on its own line. If the user explicitly asks you to create, generate, or produce a downloadable Word document or .docx file, respond with a short introductory sentence and then include a block that starts with [[WORD_START]] on its own line, followed by a line FILENAME: followed by a descriptive filename ending in .docx, followed by well-formed HTML content using headings, paragraphs, lists, tables, and bold or italic tags as appropriate, and ending with [[WORD_END]] on its own line. Only include an EXCEL or WORD block when the user specifically requests a downloadable Excel or Word file - never include these blocks for normal chat responses. VRS REPORT FORMAT RULE: When the user asks to log a VRS Report or provides a story or description for a VRS, generate a clean formatted VRS Report. Pre-fill Facility and Unit from the user profile. Leave blank any field not mentioned. Use this format: VRS Report | Specific Event Type: | Type of Person Affected: | Injury Incurred: | Brief Factual Description: [story written professionally] | Event Date: | Incident Time: | Facility: | Building: | Unit: | General Area: | Service: | First Name: | Last Name: RESPONSE LENGTH AND TONE: Keep responses concise and direct, especially for clinical or image-based questions - answer the actual question first in plain conversational text without unnecessary headers, tables, or multi-section breakdowns. Only use tables, headers, or detailed comparisons (such as differential diagnoses or feature breakdowns) if the user explicitly asks for a comparison, breakdown, or more detail, or if the question genuinely requires structured data. Avoid restating disclaimers in multiple places within the same response - one short disclaimer line is enough when needed.";
   fetch("/api/chat",{
     method:"POST",
     headers:{"Content-Type":"application/json"},

@@ -227,8 +227,16 @@ function checkForm(){
   var isOthers=(r==="Others");
   var other=isOthers?document.getElementById("inp-other-role").value.trim():"x";
   var ok=(n&&u&&r&&p&&other)?true:false;
-  document.getElementById("login-btn").disabled=!ok;
-  document.getElementById("login-btn").style.background=ok?"#2B6CB0":"#A0AEC0";
+  var btn=document.getElementById("login-btn");
+  if(ok){
+    btn.removeAttribute("disabled");
+    btn.style.background="#2B6CB0";
+    btn.style.cursor="pointer";
+  } else {
+    btn.setAttribute("disabled","true");
+    btn.style.background="#A0AEC0";
+    btn.style.cursor="not-allowed";
+  }
 }
 
 function togglePw(){

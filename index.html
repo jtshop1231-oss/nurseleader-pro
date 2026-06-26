@@ -308,7 +308,7 @@ function handleFileUpload(e){
     reader.onload=function(evt){
       var img=new Image();
       img.onload=function(){
-        var maxDim=1600;
+        var maxDim=2200;
         var w=img.naturalWidth||img.width;
         var h=img.naturalHeight||img.height;
         if(w>maxDim||h>maxDim){
@@ -318,7 +318,7 @@ function handleFileUpload(e){
         var canvas=document.createElement("canvas");
         canvas.width=w; canvas.height=h;
         canvas.getContext("2d").drawImage(img,0,0,w,h);
-        var jpegUrl=canvas.toDataURL("image/jpeg",0.85);
+        var jpegUrl=canvas.toDataURL("image/jpeg",0.92);
         attachedFile={name:file.name,content:jpegUrl.split(",")[1],dataUrl:jpegUrl,type:"image/jpeg",isImage:true};
         var div=document.getElementById("chat-messages");
         var empty=document.getElementById("chat-empty");

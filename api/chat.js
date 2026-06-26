@@ -100,7 +100,7 @@ Always respond in the same language the user writes in.`;
       method: 'POST',
       headers,
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
+        model: 'claude-opus-4-8',
         max_tokens: 2048,
         system: expertSystemPrompt,
         messages: finalMessages
@@ -109,7 +109,8 @@ Always respond in the same language the user writes in.`;
 
     const data = await response.json();
     if (!response.ok) return res.status(response.status).json({ error: data.error?.message || 'API Error' });
-    return res.status(200).json({ text: data.content[0].text });
+    const textBlock = Array.isArray(data.content) ? data.content.find(b => b.type === 'text') : null;
+    return res.status(200).json({ text: textBlock ? textBlock.text : '' });
 
   } catch (error) {
     return res.status(500).json({ error: error.message });

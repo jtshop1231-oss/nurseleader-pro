@@ -480,7 +480,7 @@ function renderText(text){
       filename=fnMatch[1].trim();
       htmlStr=content.replace(/FILENAME:\s*.+/,"");
     }
-    fileButtons.push({type:"word",filename:filename,html:htmlStr.trim()});
+    fileButtons.push({type:"word",filename:filename.replace(/\.docx?$/i,"")+".doc",html:htmlStr.trim()});
     return "";
   });
 
@@ -567,6 +567,7 @@ function generateExcelDownload(filename,dataStr){
 
 function generateWordDownload(filename,htmlContent){
   try{
+    filename=filename.replace(/\.docx?$/i,"")+".doc";
     var fullHtml='<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>'+htmlContent+'</body></html>';
     var blob=htmlDocx.asBlob(fullHtml);
     var url=URL.createObjectURL(blob);

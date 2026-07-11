@@ -168,6 +168,10 @@ function ensureMammoth(cb){if(window.mammoth)return cb();loadScript("https://cdn
 
 var currentUser=null,chatHistory=[],isLoading=false,msgCount=0,attachedFile=null;
 var MAX_MSGS=20;
+var DAILY_LIMIT=15; // messages per day per device — change this number to adjust
+function todayKey(){ return "nlp_count_"+new Date().toISOString().slice(0,10); }
+function getDailyCount(){ try{ return parseInt(localStorage.getItem(todayKey())||"0",10)||0; }catch(e){ return 0; } }
+function bumpDailyCount(){ try{ var n=getDailyCount()+1; localStorage.setItem(todayKey(),String(n)); }catch(e){} }
 
 var prompts={
   incident:"I need to write a professional hospital incident report. Please ask me for the necessary details step by step - date, time, location, patient information, what happened, and any witnesses. Then generate a complete professional incident report.",
@@ -587,11 +591,9 @@ function formatInline(text){
 function sendToAIWithImage(userMsg, imageData, imageType){
   if(isLoading)return;
   var div=document.getElementById("chat-messages");
-  if(msgCount>=MAX_MSGS){
-    var e=document.createElement("div");
-    e.className="msg error";
-    e.textContent="You have reached the maximum messages for this session. Please refresh to start a new session.";
-    div.appendChild(e);div.scrollTop=div.scrollHeight;return;
+  if(getDailyCount()>=DAILY_LIMIT){
+    doLogout();
+    return;
   }
   isLoading=true;
   var loading=document.createElement("div");
@@ -629,12 +631,18 @@ function sendToAIWithImage(userMsg, imageData, imageType){
         window.scrollTo({top: offset, behavior:"smooth"});
       }
     }, 50);
-    msgCount++;
-    var remaining=MAX_MSGS-msgCount;
-    if(remaining<=5&&remaining>0){
+    msgCount++; bumpDailyCount();
+    var remaining=(DAILY_LIMIT-getDailyCount());
+    if(remaining<=0){
+      var w=document.createElement("div");
+      w.style.cssText="background:#FFF5F5;border:2px solid #FC8181;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:700;color:#C53030;align-self:center;text-align:center;max-width:95%;";
+      w.textContent="You have used all your messages for today. Returning to login...";
+      div.appendChild(w); div.scrollTop=div.scrollHeight;
+      setTimeout(function(){ doLogout(); }, 2500);
+    } else if(remaining<=2){
       var w=document.createElement("div");
       w.style.cssText="background:#FFFBEB;border:2px solid #D69E2E;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:700;color:#744210;align-self:center;text-align:center;max-width:95%;";
-      w.textContent="Warning: "+remaining+" message"+(remaining===1?"":"s")+" remaining in this session.";
+      w.textContent=remaining+" message"+(remaining===1?"":"s")+" na lang ang natitira ngayong araw.";
       div.appendChild(w);
     }
   }).catch(function(err){
@@ -651,11 +659,9 @@ function sendToAIWithImage(userMsg, imageData, imageType){
 function sendToAIWithPDF(userMsg, pdfData, fileName){
   if(isLoading)return;
   var div=document.getElementById("chat-messages");
-  if(msgCount>=MAX_MSGS){
-    var e=document.createElement("div");
-    e.className="msg error";
-    e.textContent="You have reached the maximum messages for this session. Please refresh to start a new session.";
-    div.appendChild(e);div.scrollTop=div.scrollHeight;return;
+  if(getDailyCount()>=DAILY_LIMIT){
+    doLogout();
+    return;
   }
   isLoading=true;
   var empty=document.getElementById("chat-empty");
@@ -707,12 +713,18 @@ function sendToAIWithPDF(userMsg, pdfData, fileName){
         window.scrollTo({top: offset, behavior:"smooth"});
       }
     }, 50);
-    msgCount++;
-    var remaining=MAX_MSGS-msgCount;
-    if(remaining<=5&&remaining>0){
+    msgCount++; bumpDailyCount();
+    var remaining=(DAILY_LIMIT-getDailyCount());
+    if(remaining<=0){
+      var w=document.createElement("div");
+      w.style.cssText="background:#FFF5F5;border:2px solid #FC8181;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:700;color:#C53030;align-self:center;text-align:center;max-width:95%;";
+      w.textContent="You have used all your messages for today. Returning to login...";
+      div.appendChild(w); div.scrollTop=div.scrollHeight;
+      setTimeout(function(){ doLogout(); }, 2500);
+    } else if(remaining<=2){
       var w=document.createElement("div");
       w.style.cssText="background:#FFFBEB;border:2px solid #D69E2E;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:700;color:#744210;align-self:center;text-align:center;max-width:95%;";
-      w.textContent="Warning: "+remaining+" message"+(remaining===1?"":"s")+" remaining in this session.";
+      w.textContent=remaining+" message"+(remaining===1?"":"s")+" na lang ang natitira ngayong araw.";
       div.appendChild(w);
     }
   }).catch(function(err){
@@ -729,12 +741,9 @@ function sendToAIWithPDF(userMsg, pdfData, fileName){
 function sendToAI(userMsg,isSystem){
   if(isLoading)return;
   var div=document.getElementById("chat-messages");
-  if(msgCount>=MAX_MSGS){
-    var e=document.createElement("div");
-    e.className="msg error";
-    e.style.cssText="align-self:center;text-align:center;max-width:95%;font-weight:600;";
-    e.textContent="You have reached the maximum messages for this session. Please refresh to start a new session.";
-    div.appendChild(e); div.scrollTop=div.scrollHeight; return;
+  if(getDailyCount()>=DAILY_LIMIT){
+    doLogout();
+    return;
   }
   isLoading=true;
   var empty=document.getElementById("chat-empty");
@@ -774,12 +783,18 @@ function sendToAI(userMsg,isSystem){
         window.scrollTo({top: offset, behavior:"smooth"});
       }
     }, 50);
-    msgCount++;
-    var remaining=MAX_MSGS-msgCount;
-    if(remaining<=5&&remaining>0){
+    msgCount++; bumpDailyCount();
+    var remaining=(DAILY_LIMIT-getDailyCount());
+    if(remaining<=0){
+      var w=document.createElement("div");
+      w.style.cssText="background:#FFF5F5;border:2px solid #FC8181;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:700;color:#C53030;align-self:center;text-align:center;max-width:95%;";
+      w.textContent="You have used all your messages for today. Returning to login...";
+      div.appendChild(w); div.scrollTop=div.scrollHeight;
+      setTimeout(function(){ doLogout(); }, 2500);
+    } else if(remaining<=2){
       var w=document.createElement("div");
       w.style.cssText="background:#FFFBEB;border:2px solid #D69E2E;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:700;color:#744210;align-self:center;text-align:center;max-width:95%;";
-      w.textContent="Warning: "+remaining+" message"+(remaining===1?"":"s")+" remaining in this session.";
+      w.textContent=remaining+" message"+(remaining===1?"":"s")+" na lang ang natitira ngayong araw.";
       div.appendChild(w);
     }
   }).catch(function(err){
